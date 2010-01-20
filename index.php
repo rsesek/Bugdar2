@@ -14,8 +14,10 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-define('PHALANX_ROOT', dirname(__FILE__) . '/phalanx');
+error_reporting(E_ALL & ~E_NOTICE);
 
+// Load Phalanx core.
+define('PHALANX_ROOT', dirname(__FILE__) . '/phalanx');
 require_once PHALANX_ROOT . '/base/functions.php';
 require_once PHALANX_ROOT . '/events/event.php';
 require_once PHALANX_ROOT . '/events/event_pump.php';
@@ -23,6 +25,13 @@ require_once PHALANX_ROOT . '/events/http_dispatcher.php';
 require_once PHALANX_ROOT . '/events/view_output_handler.php';
 require_once PHALANX_ROOT . '/input/cleaner.php';
 require_once PHALANX_ROOT . '/views/view.php';
+
+// Load some standard Bugdar files.
+define('BUGDAR_ROOT', dirname(__FILE__));
+require_once BUGDAR_ROOT . '/includes/core.php';
+require_once BUGDAR_ROOT . '/includes/localizer.php';
+require_once BUGDAR_ROOT . '/events/standard_error.php';
+require_once BUGDAR_ROOT . '/events/standard_success.php';
 
 $dispatcher   = new phalanx\events\HTTPDispatcher();
 $view_handler = new phalanx\events\ViewOutputHandler();
@@ -45,8 +54,7 @@ $dispatcher->set_event_loader(
         $name  = implode('_', $parts);
         $path = "./events/$name.php";
         if (!file_exists($path))
-            // TODO: raise a 404 event.
-            phalanx\events\EventPump::Pump()->Terminate('Could not load event ' . $name);
+            phalanx\events\EventPump::Pump()->RaiseEvent(new StandardErrorEvent('Could not load event ' . $name));
         require_once $path;
         return phalanx\base\UnderscoreToCamelCase($name) . 'Event';
     }
@@ -63,6 +71,15 @@ $view_handler->set_template_loader(
     }
 );
 
-$dispatcher->Start();
+// Read the configuration file.
+$config_path = BUGDAR_ROOT . '/includes/config.php';
+if (!file_exists($config_path) || !is_readable($config_path))
+    throw new CoreException('Could not read configuration file');
+$config = new phalanx\base\KeyDescender(require $config_path);
 
+// Setup the database.
+Bugdar::BootstrapDatabase($config);
+
+// Finally, begin processing events.
+$dispatcher->Start();
 $pump->StopPump();
