@@ -77,8 +77,9 @@ if (!file_exists($config_path) || !is_readable($config_path))
     throw new CoreException('Could not read configuration file');
 $config = new phalanx\base\KeyDescender(require $config_path);
 
-// Setup the database.
+// Setup common functionality.
 Bugdar::BootstrapDatabase($config);
+Bugdar::BootstrapAuthentication($config);
 
 // Finally, begin processing events.
 $dispatcher->Start();

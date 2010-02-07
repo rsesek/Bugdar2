@@ -42,7 +42,8 @@ class UserLoginEvent extends phalanx\events\Event
 
     public function WillFire()
     {
-        // TODO: check if the user is already logged in.
+        if (Bugdar::$auth->IsLoggedIn())
+            $this->Cancel();
     }
 
     public function Fire()

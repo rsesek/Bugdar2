@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require PHALANX_ROOT . '/includes/auth/auth.php';
+require BUGDAR_ROOT . '/includes/auth/auth.php';
+require BUGDAR_ROOT . '/events/user_login.php';
 
 // AuthenticationLocal uses the default Bugdar 2 user database. It should be
 // suitable for almost everyone.
@@ -29,7 +30,7 @@ class AuthenticationLocal extends Authentication
             SELECT * FROM " . TABLE_PREFIX . "users
             WHERE user_id = ? AND authkey = ?
         ");
-        if (!$stmt->Execute(array($_COOKIES['bugdar_user'], $_COOKIE['bugdar_pass'])))
+        if (!$stmt->Execute(array($_COOKIE['bugdar_user'], $_COOKIE['bugdar_pass'])))
             return FALSE;
 
         $user = $stmt->FetchObject();
@@ -37,7 +38,7 @@ class AuthenticationLocal extends Authentication
             return FALSE;
 
         $this->current_user = $user;
-        return FALSE;
+        return $this->current_user;
     }
 
     protected function _PerformLogin()

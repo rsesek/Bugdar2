@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require PHALANX_ROOT . '/events/user_login.php';
-
 // This is the base authentication system class. The Bugdar 2 authentication
 // API is significantly more flexible than the version 1 API. However, it also
 // means implementors are required to do more work sometimes. The system is
@@ -30,8 +28,16 @@ require PHALANX_ROOT . '/events/user_login.php';
 // currently in the alpha stage of development. YOU HAVE BEEN WARNED.
 abstract class Authentication
 {
+    // The auth section of the config file.
+    protected $auth_config = NULL;
+
     // The currently logged-in user.
     protected $current_user = NULL;
+
+    public function __construct(Array $config)
+    {
+        $this->auth_config = $config;
+    }
 
     // Should return FALSE if there is not a logged in user, or the user's
     // information dictionary in |$this->current_user|. Implementers are
