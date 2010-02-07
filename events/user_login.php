@@ -16,8 +16,10 @@
 
 use phalanx\events\EventPump as EventPump;
 
-// This event takes a username and password and logs the user in. THIS EVENT IS
-// TEMPORARY and will replaced with the Rugdar 2 authentication API later.
+// This is the standard Bugdar 2 login system. It uses user_login.tpl to
+// display its login form and will then authenticate the user and set cookies.
+// If you are looking to change the credential system in Bugdar, take a look
+// at includes/auth/auth.php.
 class UserLoginEvent extends phalanx\events\Event
 {
     // Whether the user logged in successfully.
