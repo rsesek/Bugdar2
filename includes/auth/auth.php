@@ -69,4 +69,8 @@ abstract class Authentication
     // This should clear whatever login cookies or session information has been
     // set. Do not interrupt execution from within this method.
     abstract protected function _PerformLogout();
+
+    // Getters.
+    // ------------------------------------------------------------------------
+    public function current_user() { return $this->current_user; }
 }
