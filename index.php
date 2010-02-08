@@ -83,4 +83,14 @@ Bugdar::BootstrapAuthentication($config);
 
 // Finally, begin processing events.
 $dispatcher->Start();
-$pump->StopPump();
+try
+{    
+    $pump->StopPump();
+}
+catch (phalanx\views\ViewException $e)
+{
+    // We got a view exception, meaning a template couldn't be loaded. If we
+    // have any output on the buffer, let it slide. Otherwise, re-throw.
+    if (strlen(ob_get_contents()) <= 0)
+        throw $e;
+}
