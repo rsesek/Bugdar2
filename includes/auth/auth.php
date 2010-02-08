@@ -72,5 +72,5 @@ abstract class Authentication
 
     // Getters.
     // ------------------------------------------------------------------------
-    public function current_user() { return $this->current_user; }
+    public function current_user() { return ($this->current_user) ?: $this->IsLoggedIn(); }
 }
