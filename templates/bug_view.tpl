@@ -17,7 +17,7 @@
 </div>
 <? endforeach ?>
 
-<form action="new_comment" method="post">
+<form action="<?= EventLink('CommentNew') ?>" method="post">
     <input type="hidden" name="bug_id" value="$[bug.bug_id]" />
     <input type="hidden" name="do" value="submit" />
     <textarea name="body" rows="8" cols="40"></textarea>

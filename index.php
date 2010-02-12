@@ -30,6 +30,7 @@ require_once PHALANX_ROOT . '/views/view.php';
 define('BUGDAR_ROOT', dirname(__FILE__));
 require_once BUGDAR_ROOT . '/includes/core.php';
 require_once BUGDAR_ROOT . '/includes/localizer.php';
+require_once BUGDAR_ROOT . '/includes/view_helpers.php';
 require_once BUGDAR_ROOT . '/events/standard_error.php';
 require_once BUGDAR_ROOT . '/events/standard_success.php';
 
