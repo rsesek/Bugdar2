@@ -12,7 +12,7 @@
 
 <? foreach ($this->comments as $comment): ?>
 <div>
-    <strong>Posted by <a href="view_user/<?= Cleaner::HTML($comment->post_alias) ?>"><?= Cleaner::HTML($comment->post_alias) ?></a> on <?= gmdate('r', $comment->post_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></strong>
+    <strong>Posted by <a href="<?= EventLink('UserView', $comment->post_alias) ?>"><?= Cleaner::HTML($comment->post_alias) ?></a> on <?= gmdate('r', $comment->post_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></strong>
     <p><?= Cleaner::HTML($comment->body) ?></p>
 </div>
 <? endforeach ?>

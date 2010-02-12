@@ -10,9 +10,9 @@
     </tr>
     <? foreach ($this->bugs as $bug): ?>
     <tr>
-        <td><a href="view_bug/<?= Cleaner::Int($bug->bug_id) ?>"><?= Cleaner::HTML($bug->bug_id) ?></a></td>
-        <td><a href="view_bug/<?= Cleaner::Int($bug->bug_id) ?>"><?= Cleaner::HTML($bug->title) ?></a></td>
-        <td><a href="view_user/<?= Cleaner::HTML($bug->reporting_alias)?>"><?= Cleaner::HTML($bug->reporting_alias) ?></a></td>
+        <td><a href="<?= EventLink('BugView', $bug->bug_id) ?>"><?= Cleaner::HTML($bug->bug_id) ?></a></td>
+        <td><a href="<?= EventLink('BugView', $bug->bug_id) ?>"><?= Cleaner::HTML($bug->title) ?></a></td>
+        <td><a href="<?= EventLink('UserView', $bug->reporting_alias) ?>"><?= Cleaner::HTML($bug->reporting_alias) ?></a></td>
         <td><?= gmdate('r', $bug->reporting_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></td>
     </tr>
     <? endforeach ?>

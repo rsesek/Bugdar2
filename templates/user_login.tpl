@@ -1,6 +1,6 @@
 <h1>Login</h1>
 
-<form action="login_user" method="post">
+<form action="<?= EventLink('UserLogin') ?>" method="post">
 <input type="hidden" name="do" value="fire" />
 
 <dl>

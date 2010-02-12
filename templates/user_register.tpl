@@ -1,6 +1,6 @@
 <h1>Hello World!</h1>
 
-<form action="register_user" method="post">
+<form action="<?= EventLink('UserRegister') ?>" method="post">
 <input type="hidden" name="do" value="submit" />
 
 <dl>

@@ -1,6 +1,6 @@
 <h1>New Bug</h1>
 
-<form action="new_bug" method="post">
+<form action="<?= EventLink('BugNew') ?>" method="post">
 <input type="hidden" name="do" value="submit" />
 
 <dl>
