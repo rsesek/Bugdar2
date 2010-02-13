@@ -16,18 +16,11 @@
 
 error_reporting(E_ALL & ~E_NOTICE);
 
-// Load Phalanx core.
+// Define path constants.
 define('PHALANX_ROOT', dirname(__FILE__) . '/phalanx');
-require_once PHALANX_ROOT . '/base/functions.php';
-require_once PHALANX_ROOT . '/events/event.php';
-require_once PHALANX_ROOT . '/events/event_pump.php';
-require_once PHALANX_ROOT . '/events/http_dispatcher.php';
-require_once PHALANX_ROOT . '/events/view_output_handler.php';
-require_once PHALANX_ROOT . '/input/cleaner.php';
-require_once PHALANX_ROOT . '/views/view.php';
+define('BUGDAR_ROOT', dirname(__FILE__));
 
 // Load some standard Bugdar files.
-define('BUGDAR_ROOT', dirname(__FILE__));
 require_once BUGDAR_ROOT . '/includes/core.php';
 require_once BUGDAR_ROOT . '/includes/localizer.php';
 require_once BUGDAR_ROOT . '/includes/view_helpers.php';
