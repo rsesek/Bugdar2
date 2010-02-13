@@ -16,6 +16,8 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/includes/search_engine.php';
+
 // This event creates a new comment on a bug.
 class CommentNewEvent extends phalanx\events\Event
 {
@@ -50,7 +52,8 @@ class CommentNewEvent extends phalanx\events\Event
 
             $stmt = Bugdar::$db->Prepare("SELECT * FROM " . TABLE_PREFIX . "bugs WHERE bug_id = ?");
             $stmt->Execute(array($bug_id));
-            if (!$stmt->FetchObject())
+            $bug = $stmt->FetchObject();
+            if (!$bug)
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_ID_NOT_FOUND')));
 
             $body = trim($this->input->body);
@@ -65,6 +68,9 @@ class CommentNewEvent extends phalanx\events\Event
             ");
             $stmt->Execute(array($bug_id, $user->user_id, time(), $body));
             $this->comment_id = Bugdar::$db->LastInsertID();
+
+            $search = new SearchEngine();
+            $search->IndexBug($bug);
 
             EventPump::Pump()->PostEvent(new StandardSuccessEvent('view_bug/' . $bug_id, l10n::S('USER_REGISTER_SUCCESS')));
         }
