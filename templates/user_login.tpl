@@ -2,6 +2,7 @@
 
 <form action="<?= EventLink('UserLogin') ?>" method="post">
 <input type="hidden" name="do" value="fire" />
+<input type="hidden" name="last_event" value="$[last_event]" />
 
 <dl>
     <dt>Email:</dt>

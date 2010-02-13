@@ -26,18 +26,26 @@ class UserLoginEvent extends phalanx\events\Event
     protected $successful = FALSE;
     public function was_successful() { return $this->successful; }
 
+    // The last event. This is serialized in base64.
+    protected $last_event = NULL;
+    public function last_event() { return $this->last_event; }
+
     static public function InputList()
     {
         return array(
             'do',
             'email',
-            'password'
+            'password',
+            'last_event'
         );
     }
 
     static public function OutputList()
     {
-        return array('successful');
+        return array(
+            'successful',
+            'last_event'
+        );
     }
 
     public function WillFire()
@@ -65,11 +73,48 @@ class UserLoginEvent extends phalanx\events\Event
             if ($user->password != md5($this->input->password . $user->salt))
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('LOGIN_FAILED')));
 
+            // We need to set _COOKIE values so that if the last_event requires
+            // authentication, we can return the correct state.
             $expires = time() + (60 * 60 * 5);
-            setcookie('bugdar_user', $user->user_id, $expires);
-            setcookie('bugdar_pass', $user->authkey, $expires);
+            $_COOKIE['bugdar_user'] = $user->user_id;
+            $_COOKIE['bugdar_pass'] = $user->authkey;
+            setcookie('bugdar_user', $_COOKIE['bugdar_user'], $expires);
+            setcookie('bugdar_pass', $_COOKIE['bugdar_pass'], $expires);
 
-            EventPump::Pump()->PostEvent(new StandardSuccessEvent('home', l10n::S('LOGIN_SUCCESSFUL')));
+            $last_event = NULL;
+            if ($this->input->last_event)
+            {
+                $last_event = unserialize(base64_decode($this->input->last_event));
+                $class      = $last_event[0];
+                $input      = $last_event[1];
+                if (!class_exists($class))
+                {
+                    $path = phalanx\base\CamelCaseToUnderscore($class);
+                    $path = preg_replace('/_event$/', '', $path);
+                    require_once BUGDAR_ROOT . "/events/$path.php";
+                }
+                $last_event = new $class($input);
+            }
+
+            EventPump::Pump()->PostEvent(($last_event ?: new StandardSuccessEvent('home', l10n::S('LOGIN_SUCCESSFUL'))));
+            return;
+        }
+
+        // Check and see if this login event preempted some other event.
+        $events = EventPump::Pump()->GetAllEvents();
+        if ($events->Count() >= 3)
+        {
+            foreach ($events as $tuple)
+            {
+                list($state, $object) = $tuple;
+                // If we find an event that isn't a UserLoginEvent that hasn't
+                // been finished, then that's the last event.
+                if (!($object instanceof $this) && $state != EventPump::EVENT_FINISHED)
+                {
+                    $this->last_event = base64_encode(serialize(array(get_class($object), $object->input)));
+                    break;
+                }
+            }
         }
     }
 }
