@@ -16,6 +16,8 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/includes/search_engine.php';
+
 // This creates a bug with some basic parameters.
 class BugNewEvent extends phalanx\events\Event
 {
@@ -88,6 +90,13 @@ class BugNewEvent extends phalanx\events\Event
                 $stmt->Execute(array($this->comment_id, $this->bug_id));
             }
             Bugdar::$db->Commit();
+
+            $stmt = Bugdar::$db->Prepare("SELECT * FROM " . TABLE_PREFIX . "bugs WHERE bug_id = ?");
+            $stmt->Execute(array($this->bug_id));
+            $bug = $stmt->FetchObject();
+
+            $search = new SearchEngine();
+            $search->IndexBug($bug);
 
             EventPump::Pump()->PostEvent(new StandardSuccessEvent('home', l10n::S('BUG_CREATED_SUCCESSFULLY')));
         }
