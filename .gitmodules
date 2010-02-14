@@ -1,0 +1,3 @@
+[submodule "phalanx"]
+	path = phalanx
+	url = http://bluestatic.org/git/phalanx.git
