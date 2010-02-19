@@ -16,7 +16,7 @@
 
 use phalanx\base\KeyDescender as KeyDescender;
 use phalanx\events\EventPump as EventPump;
-use phalanx\input\Cleaner as Cleaner;
+use phalanx\data\Cleaner as Cleaner;
 
 // This creates a link to another event. This should be an event class name (in
 // camel case and all). The params will be passed via a GET URL.
