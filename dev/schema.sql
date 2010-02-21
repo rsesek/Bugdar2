@@ -33,3 +33,24 @@ CREATE TABLE comments
 	hidden boolean NOT NULL DEFAULT 0,
 	body text NOT NULL DEFAULT ''
 ) ENGINE=InnoDB;
+
+CREATE TABLE attributes
+(
+	title varchar(50) NOT NULL DEFAULT '' PRIMARY KEY,
+	description text NULL,
+	type enum('text', 'boolean', 'list', 'date', 'user') NOT NULL DEFAULT 'text',
+	validator_pattern varchar(250) NULL,
+	required boolean NOT NULL DEFAULT 0,
+	default_value varchar(250) NULL,
+	can_search boolean NOT NULL DEFAULT 1,
+	color_background varchar(6) NULL,
+	color_foreground varchar(6) NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE bug_attributes
+(
+	bug_id int unsigned NOT NULL DEFAULT 0,
+	attribute_title varchar(50) NOT NULL DEFAULT '',
+	value varchar(250) NOT NULL DEFAULT '',
+	PRIMARY KEY (bug_id, attribute_title, value)
+) ENGINE=InnoDB;

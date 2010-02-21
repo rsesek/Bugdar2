@@ -2,7 +2,7 @@
 
 <form action="<?= EventLink('Search') ?>" method="post">
 <input type="hidden" name="do" value="search" />
-<input type="search" name="query_string" value="<?= Cleaner::HTML($view->input->query_string) ?>" id="query_string" style="width:400px" />
+<input type="search" name="query_string" value="$[input.query_string]" id="query_string" style="width:400px" />
 <input type="submit" value="Go" />
 </form>
 

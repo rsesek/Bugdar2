@@ -1,3 +1,8 @@
+<script type="text/javascript" src="<?= WebRoot('js/attributes.js') ?>"></script>
+
+<form action="<?= EventLink('BugEdit') ?>" method="post">
+<input type="hidden" name="bug_id" value="$[bug.bug_id]" />
+
 <h1>Bug #$[bug.bug_id]: $[bug.title]</h1>
 
 <dl>
@@ -6,6 +11,12 @@
 
     <dt>Date:</dt>
     <dd><?= gmdate('r', $this->bug->reporting_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></dd>
+</dl>
+
+<div><strong>Attributes</strong></div>
+<div><a href="javascript:AddAttribute()">Add Attribute</a></div>
+
+<dl id="attributes">
 </dl>
 
 <h2>Comments</h2>
@@ -17,9 +28,16 @@
 </div>
 <? endforeach ?>
 
-<form action="<?= EventLink('CommentNew') ?>" method="post">
-    <input type="hidden" name="bug_id" value="$[bug.bug_id]" />
-    <input type="hidden" name="do" value="submit" />
-    <textarea name="body" rows="8" cols="40"></textarea>
-    <input type="submit" name="submit" value="Add Comment" id="submit" />
+<h1>Add Comment</h1>
+<textarea name="comment_body" rows="8" cols="40"></textarea>
+
+<div><input type="submit" name="submit" value="Save Changes" id="submit" /></div>
+
 </form>
+
+<script type="text/javascript" charset="utf-8">
+<? foreach ($this->bug->attributes as $attr): ?>
+    AddAttribute("<?= Cleaner::HTML($attr->attribute_title) ?>", "<?= Cleaner::HTML($attr->value) ?>");
+<? endforeach ?>
+    AddAttribute();
+</script>

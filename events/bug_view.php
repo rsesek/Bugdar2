@@ -52,6 +52,12 @@ class BugViewEvent extends phalanx\events\Event
         $stmt->Execute(array($this->input->_id));
         $this->bug = $stmt->FetchObject();
 
+        $stmt = Bugdar::$db->Prepare("SELECT * from " . TABLE_PREFIX . "bug_attributes WHERE bug_id = ?");
+        $stmt->Execute(array($this->input->_id));
+        $this->bug->attributes = array();
+        while ($attr = $stmt->FetchObject())
+            $this->bug->attributes[] = $attr;
+
         $stmt = Bugdar::$db->Prepare("
             SELECT comments.*, users.alias as post_alias
             FROM " . TABLE_PREFIX . "comments comments

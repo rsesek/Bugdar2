@@ -55,6 +55,17 @@ class SearchEngine
             $comment_blob .= $comment->body . "\n\n";
         $doc->AddField(Zend_Search_Lucene_Field::UnStored('comments', $comment_blob));
 
+        // Add all attributes.
+        $stmt = Bugdar::$db->Prepare("SELECT * FROM " . TABLE_PREFIX . "bug_attributes WHERE bug_id = ?");
+        $stmt->Execute(array($bug->bug_id));
+        $tags = array();
+        while ($attr = $stmt->FetchObject())
+            if ($attr->attribute_title)
+                $doc->AddField(Zend_Search_Lucene_Field::Keyword($attr->attribute_title, $attr->value));
+            else
+                $tags[] = $attr->value;
+        $doc->AddField(Zend_Search_Lucene_Field::Text('tag', implode(' ', $tags)));
+
         $this->lucene->AddDocument($doc);
     }
 

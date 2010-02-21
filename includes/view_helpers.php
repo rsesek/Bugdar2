@@ -18,6 +18,16 @@ use phalanx\base\KeyDescender as KeyDescender;
 use phalanx\events\EventPump as EventPump;
 use phalanx\data\Cleaner as Cleaner;
 
+// Returns the web root URL().
+function WebRoot($params = NULL)
+{
+    // BUG:K002 : view_helpers.php WebRoot() uses a hard-coded path
+    $url = '/greenfield/';
+    if (!$params)
+        return $url;
+    return $url . $params;
+}
+
 // This creates a link to another event. This should be an event class name (in
 // camel case and all). The params will be passed via a GET URL.
 function EventLink($event, $params = NULL)
