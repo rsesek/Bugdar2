@@ -37,7 +37,6 @@ class SearchEngine
 
     public function IndexBug($obj)
     {
-        $bug = new phalanx\base\KeyDescender($obj);
         $this->RemoveBug($bug->bug_id);
 
         $doc = new Zend_Search_Lucene_Document();

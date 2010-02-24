@@ -22,6 +22,7 @@ require_once PHALANX_ROOT . '/events/event_pump.php';
 require_once PHALANX_ROOT . '/events/http_dispatcher.php';
 require_once PHALANX_ROOT . '/events/view_output_handler.php';
 require_once PHALANX_ROOT . '/data/cleaner.php';
+require_once PHALANX_ROOT . '/data/model.php';
 require_once PHALANX_ROOT . '/views/view.php';
 
 
@@ -41,6 +42,7 @@ class Bugdar
         {
             self::$db = new PDO($config->{'database.dsn'}, $config->{'database.username'}, $config->{'database.password'});
             self::$db->SetAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            phalanx\data\Model::set_db(self::$db);
         }
         catch (PDOException $e)
         {

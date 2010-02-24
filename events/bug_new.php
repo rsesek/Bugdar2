@@ -16,6 +16,8 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/includes/model_bug.php';
+require_once BUGDAR_ROOT . '/includes/model_comment.php';
 require_once BUGDAR_ROOT . '/includes/search_engine.php';
 
 // This creates a bug with some basic parameters.
@@ -66,34 +68,30 @@ class BugNewEvent extends phalanx\events\Event
             Bugdar::$db->BeginTransaction();
             {
                 $now = time();
-                $stmt = Bugdar::$db->Prepare("
-                    INSERT INTO " . TABLE_PREFIX . "bugs
-                        (title, reporting_user_id, reporting_date)
-                    VALUES
-                        (?, ?, ?)
-                ");
-                $stmt->Execute(array($title, $user->user_id, $now));
-                $this->bug_id = Bugdar::$db->LastInsertID();
+
+                $bug = new Bug();
+                $bug->title             = $title;
+                $bug->reporting_user_id = $user->user_id;
+                $bug->reporting_date    = $now;
+                $bug->Insert();
+                $this->bug_id = $bug->bug_id;
 
                 // Now create the first comment.
-                $stmt = Bugdar::$db->Prepare("
-                    INSERT INTO " . TABLE_PREFIX ."comments
-                        (bug_id, post_user_id, post_date, body)
-                    VALUES
-                        (?, ?, ?, ?)
-                ");
-                $stmt->Execute(array($this->bug_id, $user->user_id, $now, $comment_body));
-                $this->comment_id = Bugdar::$db->LastInsertID();
+                $comment = new Comment();
+                $comment->bug_id       = $bug->bug_id;
+                $comment->post_user_id = $user->user_id;
+                $comment->post_date    = $now;
+                $comment->body         = $comment_body;
+                $comment->Insert();
+                $this->comment_id = $comment->comment_id;
 
                 // Update the bug so it can find that first comment easiliy.
-                $stmt = Bugdar::$db->Prepare("UPDATE " . TABLE_PREFIX . "bugs SET first_comment_id = ? WHERE bug_id = ?");
-                $stmt->Execute(array($this->comment_id, $this->bug_id));
+                $bug = new Bug($bug->bug_id);
+                $bug->first_comment_id = $comment->comment_id;
+                $bug->Update();
+                $bug->FetchInto();
             }
             Bugdar::$db->Commit();
-
-            $stmt = Bugdar::$db->Prepare("SELECT * FROM " . TABLE_PREFIX . "bugs WHERE bug_id = ?");
-            $stmt->Execute(array($this->bug_id));
-            $bug = $stmt->FetchObject();
 
             $search = new SearchEngine();
             $search->IndexBug($bug);
