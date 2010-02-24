@@ -7,7 +7,7 @@
 
 <dl>
     <dt>Reporter:</dt>
-    <dd>$[bug.reporting_alias]</dd>
+    <dd>$[bug_reporter.alias]</dd>
 
     <dt>Date:</dt>
     <dd><?= gmdate('r', $this->bug->reporting_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></dd>
@@ -36,7 +36,7 @@
 </form>
 
 <script type="text/javascript" charset="utf-8">
-<? foreach ($this->bug->attributes as $attr): ?>
+<? foreach ($this->attributes as $attr): ?>
     AddAttribute("<?= Cleaner::HTML($attr->attribute_title) ?>", "<?= Cleaner::HTML($attr->value) ?>");
 <? endforeach ?>
     AddAttribute();

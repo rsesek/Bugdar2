@@ -49,9 +49,27 @@ class Bug extends phalanx\data\Model
         ");
         $stmt->Execute(array($this->bug_id));
         while ($comment = $stmt->FetchObject())
-        {
             $comments[] = $comment;
-        }
         return $comments;
+    }
+
+    // Returns an array of all the attributes the bug has.
+    public function FetchAttributes()
+    {
+        $stmt = Bugdar::$db->Prepare("SELECT * from " . TABLE_PREFIX . "bug_attributes WHERE bug_id = ?");
+        $stmt->Execute(array($this->bug_id));
+        $attributes = array();
+        while ($attr = $stmt->FetchObject())
+            $attributes[] = $attr;
+        return $attributes;
+    }
+
+    // Returns the user who reported the bug.
+    public function FetchReporter()
+    {
+        // BUG:K003 : Bug::FetchReporter() should return a User Model object
+        $stmt = Bugdar::$db->Prepare("SELECT * FROM " . TABLE_PREFIX . "users WHERE user_id = ?");
+        $stmt->Execute(array($this->reporting_user_id));
+        return $stmt->FetchObject();
     }
 }
