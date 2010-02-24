@@ -16,6 +16,7 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/includes/model_comment.php';
 require_once BUGDAR_ROOT . '/includes/search_engine.php';
 
 // This event creates a new comment on a bug.
@@ -56,13 +57,12 @@ class BugEditEvent extends phalanx\events\Event
         $body = trim($this->input->comment_body);
         if (!empty($body))
         {
-            $stmt = Bugdar::$db->Prepare("
-                INSERT INTO " . TABLE_PREFIX ."comments
-                    (bug_id, post_user_id, post_date, body)
-                VALUES
-                    (?, ?, ?, ?)
-            ");
-            $stmt->Execute(array($bug_id, $user->user_id, time(), $body));
+            $comment = new Comment();
+            $comment->bug_id       = $bug_id;
+            $comment->post_user_id = $user->user_id;
+            $comment->post_date    = time();
+            $comment->body         = $body;
+            $comment->Insert();
         }
 
         // Delete existing attributes.
