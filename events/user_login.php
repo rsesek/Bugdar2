@@ -100,20 +100,16 @@ class UserLoginEvent extends phalanx\events\Event
             return;
         }
 
-        // Check and see if this login event preempted some other event.
+        // Find the first non-UserLoginEvent that was processed. If the event
+        // hasn't been finished, then this event preempted it and we should
+        // store its data so that the user can return to what she was doing.
         $events = EventPump::Pump()->GetAllEvents();
-        if ($events->Count() >= 3)
+        foreach ($events as $event)
         {
-            foreach ($events as $tuple)
+            if (!($event instanceof $this) && $event->state() != EventPump::EVENT_FINISHED)
             {
-                list($state, $object) = $tuple;
-                // If we find an event that isn't a UserLoginEvent that hasn't
-                // been finished, then that's the last event.
-                if (!($object instanceof $this) && $state != EventPump::EVENT_FINISHED)
-                {
-                    $this->last_event = base64_encode(serialize(array(get_class($object), $object->input)));
-                    break;
-                }
+                $this->last_event = base64_encode(serialize(array(get_class($event), $event->input)));
+                break;
             }
         }
     }

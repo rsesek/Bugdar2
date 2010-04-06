@@ -54,6 +54,14 @@ $dispatcher->set_event_loader(
     }
 );
 
+// Register bypass rules.
+$dispatcher->AddBypassRule('',       'home');
+$dispatcher->AddBypassRule('list',   'list_bug');
+$dispatcher->AddBypassRule('new',    'new_bug');
+$dispatcher->AddBypassRule('view',   'view_bug');
+$dispatcher->AddBypassRule('login',  'login_user');
+$dispatcher->AddBypassRule('logout', 'logout_user');
+
 // Transform the event name into a template name.
 phalanx\views\View::set_template_path(dirname(__FILE__) . '/templates/%s.tpl');
 phalanx\views\View::set_cache_path(dirname(__FILE__) . '/cache');
