@@ -66,7 +66,7 @@ class UserRegisterEvent extends phalanx\events\Event
                 $this->input->email,
                 $alias,
                 $salt,
-                md5($this->input->password . $salt),
+                md5(sha1($this->input->password) . $salt),
                 phalanx\base\Random(),
                 6  // TODO: uhhh... usergroups. yea.
             ));

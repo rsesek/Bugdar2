@@ -70,7 +70,7 @@ class UserLoginEvent extends phalanx\events\Event
             if (!$user)
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('LOGIN_FAILED')));
 
-            if ($user->password != md5($this->input->password . $user->salt))
+            if ($user->password != md5(sha1($this->input->password) . $user->salt))
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('LOGIN_FAILED')));
 
             // We need to set _COOKIE values so that if the last_event requires
