@@ -76,10 +76,8 @@ class UserLoginEvent extends phalanx\events\Event
             // We need to set _COOKIE values so that if the last_event requires
             // authentication, we can return the correct state.
             $expires = time() + (60 * 60 * 5);
-            $_COOKIE['bugdar_user'] = $user->user_id;
-            $_COOKIE['bugdar_pass'] = $user->authkey;
-            setcookie('bugdar_user', $_COOKIE['bugdar_user'], $expires);
-            setcookie('bugdar_pass', $_COOKIE['bugdar_pass'], $expires);
+            $this->_SetCookie('bugdar_user', $user->user_id, $expires);
+            $this->_SetCookie('bugdar_pass', $user->authkey, $expires);
 
             $last_event = NULL;
             if ($this->input->last_event)
@@ -112,5 +110,11 @@ class UserLoginEvent extends phalanx\events\Event
                 break;
             }
         }
+    }
+
+    protected function _SetCookie($name, $value, $expires)
+    {
+        $_COOKIE[$name] = $value;
+        setcookie($name, $value, $expires);
     }
 }
