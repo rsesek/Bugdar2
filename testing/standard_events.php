@@ -35,3 +35,24 @@ class StandardSuccessEvent extends phalanx\events\Event
     public function Fire()
     {}
 }
+
+class StandardErrorEvent extends phalanx\events\Event
+{
+    static public function InputList()
+    {
+        return array();
+    }
+
+    static public function OutputList()
+    {
+        return array();
+    }
+
+    public function __construct($message)
+    {
+        $this->message  = $message;
+    }
+
+    public function Fire()
+    {}
+}

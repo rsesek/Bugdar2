@@ -26,7 +26,6 @@ require_once BUGDAR_ROOT . '/includes/core.php';
 require_once BUGDAR_ROOT . '/includes/auth/auth.php';
 require_once BUGDAR_ROOT . '/includes/localizer.php';
 require_once BUGDAR_ROOT . '/includes/view_helpers.php';
-require_once BUGDAR_ROOT . '/events/standard_error.php';
 
 // Load some more phalanx files.
 require_once PHALANX_ROOT . '/events/unit_test_output_handler.php';

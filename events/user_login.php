@@ -16,6 +16,8 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/includes/model_user.php';
+
 // This is the standard Bugdar 2 login system. It uses user_login.tpl to
 // display its login form and will then authenticate the user and set cookies.
 // If you are looking to change the credential system in Bugdar, take a look
@@ -58,20 +60,22 @@ class UserLoginEvent extends phalanx\events\Event
     {
         if ($this->input->do == 'fire')
         {
-            $stmt = Bugdar::$db->Prepare("
-                SELECT user_id, email, password, salt, authkey
-                FROM " . TABLE_PREFIX . "users
-                WHERE email = ?
-            ");
-            if (!$stmt->Execute(array($this->input->email)))
-                throw new Exception('failed to execute!');
+            $user = new User();
+            $user->set_condition('email = :email');
+            $user->email = $this->input->email;
 
-            $user = $stmt->FetchObject();
-            if (!$user)
+            try {
+                $user = $user->Fetch();
+            }
+            catch (phalanx\data\ModelException $e) {
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('LOGIN_FAILED')));
+                return;
+            }
 
-            if ($user->password != md5(sha1($this->input->password) . $user->salt))
+            if ($user->password != md5(sha1($this->input->password) . $user->salt)) {
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('LOGIN_FAILED')));
+                return;
+            }
 
             // We need to set _COOKIE values so that if the last_event requires
             // authentication, we can return the correct state.
@@ -94,6 +98,7 @@ class UserLoginEvent extends phalanx\events\Event
                 $last_event = new $class($input);
             }
 
+            $this->successful = TRUE;
             EventPump::Pump()->PostEvent(($last_event ?: new StandardSuccessEvent('home', l10n::S('LOGIN_SUCCESSFUL'))));
             return;
         }
