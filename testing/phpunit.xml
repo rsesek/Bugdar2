@@ -29,6 +29,8 @@
     <filter>
         <blacklist>
             <directory>./</directory>  <!-- Don't get coverage for test files. -->
+            <directory>../zend_lucene/</directory>
+            <directory>../phalanx/</directory>
         </blacklist>
     </filter>
 

@@ -22,7 +22,7 @@ class AuthenticationTest extends Authentication
 {
     public function IsLoggedIn()
     {
-        return TRUE;
+        return ($this->current_user != NULL);
     }
 
     public function __construct($user)

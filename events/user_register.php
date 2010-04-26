@@ -38,6 +38,12 @@ class UserRegisterEvent extends phalanx\events\Event
         return array('user_id');
     }
 
+    public function WillFire()
+    {
+        if (Bugdar::$auth->IsLoggedIn())
+            $this->Cancel();
+    }
+
     public function Fire()
     {
         if ($this->input->do == 'submit')
