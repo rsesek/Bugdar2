@@ -16,6 +16,8 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/includes/model_user.php';
+
 // This event takes some basic user data and will create a user account,
 // returning the new user's ID.
 class UserRegisterEvent extends phalanx\events\Event
@@ -62,22 +64,13 @@ class UserRegisterEvent extends phalanx\events\Event
             $alias = preg_replace('/[^a-zA-Z0-9\-_,\. ]/', '', $this->input->alias);
             $salt  = phalanx\base\Random(10);
 
-            $stmt = Bugdar::$db->Prepare("
-                INSERT INTO " . TABLE_PREFIX . "users
-                    (email, alias, salt, password, authkey, usergroup_id)
-                VALUES
-                    (?, ?, ?, ?, ?, ?)
-            ");
-            $stmt->Execute(array(
-                $this->input->email,
-                $alias,
-                $salt,
-                md5(sha1($this->input->password) . $salt),
-                phalanx\base\Random(),
-                6  // TODO: uhhh... usergroups. yea.
-            ));
-
-            $this->user_id = Bugdar::$db->LastInsertID();
+            $user = new User();
+            $user->email        = $this->input->email;
+            $user->alias        = preg_replace('/[^a-zA-Z0-9\-_,\. ]/', '', $this->input->alias);
+            $user->password     = sha1($this->input->password);
+            $user->usergroup_id = 6;  // TODO: uhhh... usergroups. yea.
+            $user->Insert();
+            $this->user_id = $user->user_id;
 
             EventPump::Pump()->PostEvent(new StandardSuccessEvent('login', l10n::S('USER_REGISTER_SUCCESS')));
         }
