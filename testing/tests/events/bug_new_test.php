@@ -41,7 +41,7 @@ class BugNewEventTest extends BugdarTestCase
         $bug->FetchInto();
         $this->assertEquals($data->title, $bug->title);
         $this->assertEquals(Bugdar::$auth->current_user()->user_id, $bug->reporting_user_id);
-        $this->assertFalse($bug->hidden);
+        $this->assertEquals(0, $bug->hidden);
         $this->assertGreaterThanOrEqual($time, $bug->reporting_date);
 
         $comment = new Comment($event->comment_id());
