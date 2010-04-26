@@ -34,13 +34,14 @@ class BugNewEventTest extends BugdarTestCase
             'comment_body' => 'This is a Test Bug'
         ));
         $event = new BugNewEvent($data);
-        $time = time();
+        $time  = time();
         EventPump::Pump()->PostEvent($event);
 
         $bug = new Bug($event->bug_id());
         $bug->FetchInto();
         $this->assertEquals($data->title, $bug->title);
         $this->assertEquals(Bugdar::$auth->current_user()->user_id, $bug->reporting_user_id);
+        $this->assertFalse($bug->hidden);
         $this->assertGreaterThanOrEqual($time, $bug->reporting_date);
 
         $comment = new Comment($event->comment_id());
