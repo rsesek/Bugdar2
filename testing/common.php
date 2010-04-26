@@ -23,10 +23,17 @@ define('TEST_ROOT', dirname(__FILE__));
 
 // Load some standard Bugdar files.
 require_once BUGDAR_ROOT . '/includes/core.php';
+require_once BUGDAR_ROOT . '/includes/auth/auth.php';
 require_once BUGDAR_ROOT . '/includes/localizer.php';
 require_once BUGDAR_ROOT . '/includes/view_helpers.php';
 require_once BUGDAR_ROOT . '/events/standard_error.php';
-require_once BUGDAR_ROOT . '/events/standard_success.php';
+
+// Load some more phalanx files.
+require_once PHALANX_ROOT . '/events/unit_test_output_handler.php';
+
+// Test Bugdar files.
+require_once BUGDAR_ROOT . '/testing/test_case.php';
+require_once BUGDAR_ROOT . '/testing/standard_events.php';
 
 // Read the configuration file.
 $config_path = BUGDAR_ROOT . '/testing/config.php';
@@ -36,3 +43,9 @@ $config = new phalanx\base\KeyDescender(require $config_path);
 
 // Setup common functionality.
 Bugdar::BootstrapDatabase($config);
+
+// Clean out the test database.
+Bugdar::$db->Query("TRUNCATE TABLE " . TABLE_PREFIX . "users");
+Bugdar::$db->Query("TRUNCATE TABLE " . TABLE_PREFIX . "bugs");
+Bugdar::$db->Query("TRUNCATE TABLE " . TABLE_PREFIX . "comments");
+

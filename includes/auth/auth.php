@@ -49,7 +49,7 @@ abstract class Authentication
     public function RequireAuthentication()
     {
         if ($this->IsLoggedIn())
-            return $this->current_user;
+            return $this->current_user();
         $this->_PerformLogin();
     }
 
@@ -72,5 +72,5 @@ abstract class Authentication
 
     // Getters.
     // ------------------------------------------------------------------------
-    public function current_user() { return ($this->current_user) ?: $this->IsLoggedIn(); }
+    public function current_user() { return $this->current_user; }
 }

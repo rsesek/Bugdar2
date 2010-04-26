@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require BUGDAR_ROOT . '/includes/auth/auth.php';
-require BUGDAR_ROOT . '/events/user_login.php';
+require_once BUGDAR_ROOT . '/includes/auth/auth.php';
+require_once BUGDAR_ROOT . '/events/user_login.php';
 
 // AuthenticationLocal uses the default Bugdar 2 user database. It should be
 // suitable for almost everyone.
@@ -23,8 +23,8 @@ class AuthenticationLocal extends Authentication
 {
     public function IsLoggedIn()
     {
-        if ($this->current_user)
-            return $this->current_user;
+        if ($this->current_user())
+            return $this->current_user();
 
         $stmt = Bugdar::$db->Prepare("
             SELECT * FROM " . TABLE_PREFIX . "users

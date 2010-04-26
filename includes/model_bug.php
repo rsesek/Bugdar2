@@ -27,11 +27,11 @@ class Bug extends phalanx\data\Model
     // Struct properties.
     protected $fields = array(
         'bug_id',
-    	'title',
-    	'reporting_user_id',
-    	'reporting_date',
-    	'hidden',
-    	'first_comment_id'
+        'title',
+        'reporting_user_id',
+        'reporting_date',
+        'hidden',
+        'first_comment_id'
     );
 
     // Fetches all the comments for a bug and returns them in a time descending
