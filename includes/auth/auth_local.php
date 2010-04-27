@@ -15,6 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once BUGDAR_ROOT . '/includes/auth/auth.php';
+require_once BUGDAR_ROOT . '/includes/model_user.php';
 require_once BUGDAR_ROOT . '/events/user_login.php';
 
 // AuthenticationLocal uses the default Bugdar 2 user database. It should be
@@ -26,15 +27,15 @@ class AuthenticationLocal extends Authentication
         if ($this->current_user())
             return $this->current_user();
 
-        $stmt = Bugdar::$db->Prepare("
-            SELECT * FROM " . TABLE_PREFIX . "users
-            WHERE user_id = ? AND authkey = ?
-        ");
-        if (!$stmt->Execute(array($_COOKIE['bugdar_user'], $_COOKIE['bugdar_pass'])))
+        $user = new User($_COOKIE['bugdar_user']);
+        try {
+            $user->FetchInto();
+        }
+        catch (phalanx\data\ModelException $e) {
             return FALSE;
+        }
 
-        $user = $stmt->FetchObject();
-        if (!$user)
+        if ($user->authkey != $_COOKIE['bugdar_pass'])
             return FALSE;
 
         $this->current_user = $user;
