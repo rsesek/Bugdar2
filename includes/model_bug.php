@@ -67,9 +67,8 @@ class Bug extends phalanx\data\Model
     // Returns the user who reported the bug.
     public function FetchReporter()
     {
-        // BUG:K003 : Bug::FetchReporter() should return a User Model object
-        $stmt = Bugdar::$db->Prepare("SELECT * FROM " . TABLE_PREFIX . "users WHERE user_id = ?");
-        $stmt->Execute(array($this->reporting_user_id));
-        return $stmt->FetchObject();
+        $user = new User($this->reporting_user_id);
+        $user->FetchInto();
+        return $user;
     }
 }
