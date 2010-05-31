@@ -48,18 +48,23 @@ class UserRegisterEvent extends phalanx\events\Event
 
     public function Fire()
     {
-        if ($this->input->do == 'submit')
-        {
-            if (!filter_var($this->input->email, FILTER_VALIDATE_EMAIL))
+        if ($this->input->do == 'submit') {
+            if (!filter_var($this->input->email, FILTER_VALIDATE_EMAIL)) {
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('INVALID_EMAIL')));
+                return;
+            }
 
-            if (strlen($this->input->password) <= 4)
+            if (strlen($this->input->password) <= 4) {
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('PASSWORD_TOO_SHORT')));
+                return;
+            }
 
             $stmt = Bugdar::$db->Prepare("SELECT COUNT(*) AS count FROM users WHERE email = ?");
             $stmt->Execute(array($this->input->email));
-            if ($stmt->FetchObject()->count > 0)
+            if ($stmt->FetchObject()->count > 0) {
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('EMAIL_IN_USE')));
+                return;
+            }
 
             $alias = preg_replace('/[^a-zA-Z0-9\-_,\. ]/', '', $this->input->alias);
             $salt  = phalanx\base\Random(10);

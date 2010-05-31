@@ -53,4 +53,20 @@ class UserRegisterEventTest extends BugdarTestCase
         $this->assertEquals(md5(sha1($data->password) . $user->salt), $user->password);
         $this->assertGreaterThanOrEqual(5, strlen($user->authkey));
     }
+
+    public function testDuplicateEmail()
+    {
+        Bugdar::$auth = new AuthenticationTest(NULL);
+        $data = new phalanx\base\PropertyBag(array(
+            'do'           => 'submit',
+            'email'        => 'robert@bluestatic.org',
+            'alias'        => 'Robert',
+            'password'     => 'abc123'
+        ));
+        $event = new UserRegisterEvent($data);
+        EventPump::Pump()->PostEvent($event);
+
+        $last_event = EventPump::Pump()->GetEventChain()->Top();
+        $this->assertType('StandardErrorEvent', $last_event);
+    }
 }

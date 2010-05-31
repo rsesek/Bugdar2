@@ -54,5 +54,7 @@ class StandardErrorEvent extends phalanx\events\Event
     }
 
     public function Fire()
-    {}
+    {
+        phalanx\events\EventPump::Pump()->CancelDeferredEvents();
+    }
 }

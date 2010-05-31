@@ -36,7 +36,7 @@ class StandardErrorEvent extends phalanx\events\Event
 
     public function Fire()
     {
-        // Do nothing.
+        phalanx\events\EventPump::Pump()->CancelDeferredEvents();
     }
 
     public function Cleanup()
