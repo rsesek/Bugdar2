@@ -69,4 +69,20 @@ class UserRegisterEventTest extends BugdarTestCase
         $last_event = EventPump::Pump()->GetEventChain()->Top();
         $this->assertType('StandardErrorEvent', $last_event);
     }
+
+    public function testInvalidEmail()
+    {
+        Bugdar::$auth = new AuthenticationTest(NULL);
+        $data = new phalanx\base\PropertyBag(array(
+            'do'           => 'submit',
+            'email'        => 'robert',
+            'alias'        => 'Robert',
+            'password'     => 'abc123'
+        ));
+        $event = new UserRegisterEvent($data);
+        EventPump::Pump()->PostEvent($event);
+
+        $last_event = EventPump::Pump()->GetEventChain()->Top();
+        $this->assertType('StandardErrorEvent', $last_event);
+    }
 }
