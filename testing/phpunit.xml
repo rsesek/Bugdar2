@@ -22,6 +22,7 @@
 
     <testsuites>
         <testsuite name="Events">
+            <directory suffix="_test.php">./tests/</directory>
             <directory suffix="_test.php">./tests/events/</directory>
         </testsuite>
     </testsuites>

@@ -34,6 +34,9 @@ class Bug extends phalanx\data\Model
         'first_comment_id'
     );
 
+    // Cached attributes.
+    protected $attributes = array();
+
     // Fetches all the comments for a bug and returns them in a time descending
     // order, oldest to newest.
     public function FetchComments()
@@ -56,12 +59,14 @@ class Bug extends phalanx\data\Model
     // Returns an array of all the attributes the bug has.
     public function FetchAttributes()
     {
+        if ($this->attributes)
+            return $this->attributes;
+
         $stmt = Bugdar::$db->Prepare("SELECT * from " . TABLE_PREFIX . "bug_attributes WHERE bug_id = ?");
         $stmt->Execute(array($this->bug_id));
-        $attributes = array();
         while ($attr = $stmt->FetchObject())
-            $attributes[] = $attr;
-        return $attributes;
+            $this->attributes[] = $attr;
+        return $this->attributes;
     }
 
     // Returns the user who reported the bug.
@@ -70,5 +75,38 @@ class Bug extends phalanx\data\Model
         $user = new User($this->reporting_user_id);
         $user->FetchInto();
         return $user;
+    }
+
+    // Sets an attribute. If |key| is NULL, this will act as a tag. Note that
+    // this does not perform validation or permission checks.
+    public function SetAttribute($key, $value)
+    {
+        $this->FetchAttributes();
+        $stmt = NULL;
+        foreach ($this->attributes as $i => $attr) {
+            if ($attr->attribute_title == $key) {
+                $stmt = Bugdar::$db->Prepare("
+                    UPDATE " . TABLE_PREFIX . "bug_attributes
+                    SET value = :value
+                    WHERE bug_id = :bug_id
+                    AND attribute_title = :attribute_title
+                ");
+                $this->attributes[$i]->value = $value;
+                break;
+            }
+        }
+        if (!$stmt) {
+            $stmt = Bugdar::$db->Prepare("
+                INSERT INTO " . TABLE_PREFIX . "bug_attributes
+                    (bug_id, attribute_title, value)
+                VALUES
+                    (:bug_id, :attribute_title, :value)
+            ");
+        }
+        $stmt->Execute(array(
+            'bug_id'          => $this->bug_id,
+            'attribute_title' => $key,
+            'value'           => $value
+        ));
     }
 }
