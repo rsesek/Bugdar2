@@ -109,4 +109,25 @@ class Bug extends phalanx\data\Model
             'value'           => $value
         ));
     }
+
+    // Removes an attribute or tag.
+    public function RemoveAttribute($key, $is_tag = FALSE)
+    {
+        if ($is_tag) {
+            $stmt = Bugdar::$db->Prepare("
+                DELETE FROM " . TABLE_PREFIX . "bug_attributes
+                WHERE bug_id = ?
+                AND value = ?
+                AND attribute_title IS EMPTY
+            ");
+            $stmt->Execute(array($this->bug_id, $key));
+        } else {
+            $stmt = Bugdar::$db->Prepare("
+                DELETE FROM " . TABLE_PREFIX . "bug_attributes
+                WHERE bug_id = ?
+                AND attribute_title = ?
+            ");
+            $stmt->Execute(array($this->bug_id, $key));
+        }
+    }
 }

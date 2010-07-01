@@ -52,6 +52,15 @@ class Attribute extends phalanx\data\Model
       const ACCESS_WRITE = 2;
     // }}
 
+    public function is_tag()
+    {
+        return empty($this->title);
+    }
+    public function is_attribute()
+    {
+        return !empty($this->title);
+    }
+
     // Returns the access level that |user| has for this attribute for |bug|.
     public function CheckAccess(User $user, Bug $bug)
     {

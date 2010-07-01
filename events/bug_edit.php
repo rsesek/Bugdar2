@@ -16,6 +16,7 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/includes/model_bug.php';
 require_once BUGDAR_ROOT . '/includes/model_comment.php';
 require_once BUGDAR_ROOT . '/includes/search_engine.php';
 
@@ -27,7 +28,9 @@ class BugEditEvent extends phalanx\events\Event
         return array(
             'bug_id',
             'comment_body',
-            'attributes'
+            'attributes',
+            'tags_new',
+            'tags_deleted'
         );
     }
 
@@ -43,50 +46,69 @@ class BugEditEvent extends phalanx\events\Event
 
     public function Fire()
     {
-        $bug_id = phalanx\data\Cleaner::Int($this->input->bug_id);
-        $user   = Bugdar::$auth->current_user();
+        $bug  = new Bug($this->input->bug_id);
+        $user = Bugdar::$auth->current_user();
 
-        $stmt = Bugdar::$db->Prepare("SELECT * FROM " . TABLE_PREFIX . "bugs WHERE bug_id = ?");
-        $stmt->Execute(array($bug_id));
-        $bug = $stmt->FetchObject();
-        if (!$bug)
+        try {
+            $bug->FetchInto();
+        } catch (\phalanx\data\ModelException $e) {
             EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_ID_NOT_FOUND')));
+            return;
+        }
 
         Bugdar::$db->BeginTransaction();
 
+        // Add a comment if one is present.
         $body = trim($this->input->comment_body);
-        if (!empty($body))
-        {
+        if (!empty($body)) {
             $comment = new Comment();
-            $comment->bug_id       = $bug_id;
+            $comment->bug_id       = $bug->bug_id;
             $comment->post_user_id = $user->user_id;
             $comment->post_date    = time();
             $comment->body         = $body;
             $comment->Insert();
         }
 
-        // Delete existing attributes.
-        $stmt = Bugdar::$db->Prepare("DELETE FROM " . TABLE_PREFIX . "bug_attributes WHERE bug_id = ?");
-        $stmt->Execute(array($bug_id));
-        
-        // Replace the attributes with the new ones.
-        foreach ($this->input->attributes as $attr)
-        {
-            // Skip completely empty attributes.
-            if (empty($attr['title']) && empty($attr['value']))
-                continue;
-
-            // Attributes without titles are tags.
-            if (empty($attr['title']))
-            {
-                $stmt = Bugdar::$db->Prepare("INSERT INTO " . TABLE_PREFIX . "bug_attributes (bug_id, value) VALUES (?, ?)");
-                $stmt->Execute(array($bug_id, $attr['value']));
+        // Handle tags.
+        if (is_array($this->input->tags_new)) {
+            foreach ($this->input->tags_new as $tag) {
+                $bug->SetAttribute('', $tag);
             }
-            // Attributes with both title and value are fields.
-            else
-            {
-                $stmt = Bugdar::$db->Prepare("INSERT INTO " . TABLE_PREFIX . "bug_attributes (bug_id, attribute_title, value) VALUES (?, ?, ?)");
-                $stmt->Execute(array($bug_id, $attr['title'], $attr['value']));
+        }
+        if (is_array($this->input->tags_deleted)) {
+            foreach ($this->input->tags_deleted as $tag) {
+                $bug->RemoveAttribute($tag, TRUE);
+            }
+        }
+
+        // Create a map of all the set attributes.
+        $set_attributes = array();
+        if (is_array($this->input->attributes)) {
+            foreach ($this->input->attributes as $attr) {
+                // If this is an empty attribute, ignore it.
+                if (empty($attr['title']) || empty($attr['value'])) {
+                    continue;
+                }
+                $set_attributes[$attr['title']] = $attr['value'];
+            }
+
+            // Get all potential attributes; this includes defined tags.
+            $attributes = Attributes::FetchGroup();
+            foreach ($attributes as $attr) {
+                // If the user is allowed to write to this attribute, update the
+                // value.
+                if ($attr->is_attribute() && $attr->CheckAccess($user, $bug) & Attribute::ACCESS_WRITE) {
+                    // If there is no value for this attribute, then it was removed.
+                    if (!isset($set_attributes[$attr->title])) {
+                        $bug->RemoveAttribute($attr->title, $attr->is_tag());
+                    }
+
+                    // Otherwise, update the value.
+                    $validate = $attr->Validate($set_attributes[$attr->title]);
+                    if ($validate[0]) {
+                        $bug->SetAttribute($attr->title, $validate[1]);
+                    }
+                }
             }
         }
 
@@ -95,6 +117,6 @@ class BugEditEvent extends phalanx\events\Event
         $search = new SearchEngine();
         $search->IndexBug($bug);
 
-        EventPump::Pump()->PostEvent(new StandardSuccessEvent('view_bug/' . $bug_id, l10n::S('USER_REGISTER_SUCCESS')));
+        EventPump::Pump()->PostEvent(new StandardSuccessEvent('view_bug/' . $bug->bug_id, l10n::S('USER_REGISTER_SUCCESS')));
     }
 }
