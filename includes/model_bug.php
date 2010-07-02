@@ -37,6 +37,13 @@ class Bug extends phalanx\data\Model
     // Cached attributes.
     protected $attributes = array();
 
+    // Override FetchInto() to clear the attribute cache.
+    public function FetchInto()
+    {
+        $this->attributes = array();
+        return parent::FetchInto();
+    }
+
     // Fetches all the comments for a bug and returns them in a time descending
     // order, oldest to newest.
     public function FetchComments()
@@ -62,10 +69,12 @@ class Bug extends phalanx\data\Model
         if ($this->attributes)
             return $this->attributes;
 
+        $this->attributes = array();
         $stmt = Bugdar::$db->Prepare("SELECT * from " . TABLE_PREFIX . "bug_attributes WHERE bug_id = ?");
         $stmt->Execute(array($this->bug_id));
-        while ($attr = $stmt->FetchObject())
+        while ($attr = $stmt->FetchObject()) {
             $this->attributes[] = $attr;
+        }
         return $this->attributes;
     }
 
@@ -82,9 +91,13 @@ class Bug extends phalanx\data\Model
     public function SetAttribute($key, $value)
     {
         $this->FetchAttributes();
-        $stmt = NULL;
+        $stmt   = NULL;
+        $is_new = FALSE;
+
+        // Updating a tag isn't possible; a user either adds and removes one.
+        // Attributes, however, can be updated.
         foreach ($this->attributes as $i => $attr) {
-            if ($attr->attribute_title == $key) {
+            if ($key && $attr->attribute_title == $key) {
                 $stmt = Bugdar::$db->Prepare("
                     UPDATE " . TABLE_PREFIX . "bug_attributes
                     SET value = :value
@@ -95,7 +108,9 @@ class Bug extends phalanx\data\Model
                 break;
             }
         }
+        // An update wasn't performed, so insert a new record.
         if (!$stmt) {
+            $is_new = TRUE;
             $stmt = Bugdar::$db->Prepare("
                 INSERT INTO " . TABLE_PREFIX . "bug_attributes
                     (bug_id, attribute_title, value)
@@ -103,11 +118,16 @@ class Bug extends phalanx\data\Model
                     (:bug_id, :attribute_title, :value)
             ");
         }
-        $stmt->Execute(array(
+        $data = array(
             'bug_id'          => $this->bug_id,
             'attribute_title' => $key,
             'value'           => $value
-        ));
+        );
+        $stmt->Execute($data);
+        // If this is a new record, add it to the attribute cache.
+        if ($is_new) {
+            $this->attributes[] = new \phalanx\base\PropertyBag($data);
+        }
     }
 
     // Removes an attribute or tag.
@@ -118,7 +138,7 @@ class Bug extends phalanx\data\Model
                 DELETE FROM " . TABLE_PREFIX . "bug_attributes
                 WHERE bug_id = ?
                 AND value = ?
-                AND attribute_title IS EMPTY
+                AND attribute_title = ''
             ");
             $stmt->Execute(array($this->bug_id, $key));
         } else {
@@ -128,6 +148,14 @@ class Bug extends phalanx\data\Model
                 AND attribute_title = ?
             ");
             $stmt->Execute(array($this->bug_id, $key));
+        }
+        // Remove the attribute from the cache.
+        foreach ($this->attributes as $i => $attr) {
+            if ((!$is_tag && $attr->attribute_title == $key) ||
+                ($is_tag && $attr->value == $key)) {
+                unset($this->attributes[$i]);
+                break;
+            }
         }
     }
 }

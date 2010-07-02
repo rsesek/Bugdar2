@@ -44,7 +44,7 @@ $config = new phalanx\base\KeyDescender(require $config_path);
 Bugdar::BootstrapDatabase($config);
 
 // Clean out the test database.
-Bugdar::$db->Query("TRUNCATE TABLE " . TABLE_PREFIX . "users");
-Bugdar::$db->Query("TRUNCATE TABLE " . TABLE_PREFIX . "bugs");
-Bugdar::$db->Query("TRUNCATE TABLE " . TABLE_PREFIX . "comments");
-
+$stmt = Bugdar::$db->Query("SHOW TABLES");
+while ($table = $stmt->Fetch(PDO::FETCH_NUM)) {
+    Bugdar::$db->Query("TRUNCATE TABLE " . TABLE_PREFIX . $table[0]);
+}
