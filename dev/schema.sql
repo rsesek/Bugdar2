@@ -54,3 +54,11 @@ CREATE TABLE bug_attributes
 	value varchar(250) NOT NULL DEFAULT '',
 	PRIMARY KEY (bug_id, attribute_title, value)
 ) ENGINE=InnoDB;
+
+CREATE TABLE usergroups
+(
+	usergroup_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	title varchar(50) NOT NULL DEFAULT '',
+	display_title varchar(100) NOT NULL DEFAULT '',
+	mask int unsigned NOT NULL DEFAULT 0
+) ENGINE=InnoDB;
