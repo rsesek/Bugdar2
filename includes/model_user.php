@@ -15,6 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once PHALANX_ROOT . '/data/model.php';
+require_once BUGDAR_ROOT . '/includes/model_usergroup.php';
 
 class User extends phalanx\data\Model
 {
@@ -48,5 +49,15 @@ class User extends phalanx\data\Model
         $this->password = md5($this->password /*sha1*/ . $this->salt);
         $this->authkey  = \phalanx\base\Random();
         parent::Insert();
+    }
+
+    // Returns an array of Usergroups to which the user belongs. The array will
+    // always contain at least 1 element at index 0: the primary usergroup.
+    public function FetchUsergroups()
+    {
+        $group_list = $this->usergroup_id;
+        if (strlen($this->other_usergroup_ids))
+            $group_list .= ',' . $this->other_usergroup_ids;
+        return Usergroup::FetchGroup('usergroup_id IN (' . $group_list . ')');
     }
 }

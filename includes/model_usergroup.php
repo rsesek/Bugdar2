@@ -30,4 +30,18 @@ class Usergroup extends phalanx\data\Model
       'title',
       'mask'
     );
+
+    // Permission masks {{
+      const CAN_VIEW              = 1;
+      const CAN_REPORT            = 2;
+      const CAN_VOTE              = 4;
+      const CAN_COMMENT           = 8;
+      const CAN_UPDATE            = 16;
+      const CAN_VIEW_HIDDEN       = 32;
+      const CAN_EDIT_OWN_COMMENTS = 64;
+      const CAN_EDIT_ALL_COMMENTS = 128;
+      const CAN_EDIT_REPORT       = 256;
+      const CAN_DELETE_COMMENTS   = 512;
+      const CAN_DELTE_REPORTS     = 1024;
+    // }}
 }
