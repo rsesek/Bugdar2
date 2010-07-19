@@ -16,7 +16,10 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/events/standard_error.php';
 require_once BUGDAR_ROOT . '/includes/model_bug.php';
+require_once BUGDAR_ROOT . '/includes/model_user.php';
+require_once BUGDAR_ROOT . '/includes/model_usergroup.php';
 
 // This views information of a bug.
 class BugViewEvent extends phalanx\events\Event
@@ -50,6 +53,24 @@ class BugViewEvent extends phalanx\events\Event
             'bug_reporter',
             'attributes'
         );
+    }
+
+    public function WillFire()
+    {
+        $user       = Bugdar::$auth->current_user();
+        $can_view   = FALSE;
+        $usergroups = array();
+        if (!$user) {
+            $usergroups = array(Usergroup::AnonymousGroup());
+        } else {
+            $usergroups = $user->FetchUsergroups();
+        }
+        foreach ($usergroups as $usergroup) {
+            $can_view |= $usergroup->mask & Usergroup::CAN_VIEW;
+        }
+        if (!$can_view) {
+            EventPump::Pump()->RaiseEvent(new StandardErrorEvent('NO_PERMISSION_CAN_VIEW'));
+        }
     }
 
     public function Fire()

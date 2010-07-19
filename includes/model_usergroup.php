@@ -44,4 +44,9 @@ class Usergroup extends phalanx\data\Model
       const CAN_DELETE_COMMENTS   = 512;
       const CAN_DELTE_REPORTS     = 1024;
     // }}
+
+    // Returns the Usergroup object that informs the permissions of all
+    // unregistered users (guests).
+    static public function AnonymousGroup()
+    {}
 }
