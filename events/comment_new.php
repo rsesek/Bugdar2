@@ -16,13 +16,15 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/includes/model_bug.php';
+require_once BUGDAR_ROOT . '/includes/model_comment.php';
 require_once BUGDAR_ROOT . '/includes/search_engine.php';
 
 // This event creates a new comment on a bug.
 class CommentNewEvent extends phalanx\events\Event
 {
-    protected $user_id = 0;
-    public function user_id() { return $this->user_id; }
+    protected $comment_id = 0;
+    public function comment_id() { return $this->comment_id; }
 
     static public function InputList()
     {
@@ -45,29 +47,28 @@ class CommentNewEvent extends phalanx\events\Event
 
     public function Fire()
     {
-        if ($this->input->do == 'submit')
-        {
-            $bug_id = phalanx\input\Cleaner::Int($this->input->bug_id);
-            $user   = Bugdar::$auth->current_user();
-
-            $stmt = Bugdar::$db->Prepare("SELECT * FROM " . TABLE_PREFIX . "bugs WHERE bug_id = ?");
-            $stmt->Execute(array($bug_id));
-            $bug = $stmt->FetchObject();
-            if (!$bug)
+        if ($this->input->do == 'submit') {
+            $bug = new Bug($this->input->bug_id);
+            try {
+                $bug->FetchInto();
+            } catch (phalanx\data\ModelException $e) {
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_ID_NOT_FOUND')));
+                return;
+            }
 
             $body = trim($this->input->body);
-            if (empty($body))
+            if (empty($body)) {
                 EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('COMMENT_MISSING_BODY')));
+                return;
+            }
 
-            $stmt = Bugdar::$db->Prepare("
-                INSERT INTO " . TABLE_PREFIX ."comments
-                    (bug_id, post_user_id, post_date, body)
-                VALUES
-                    (?, ?, ?, ?)
-            ");
-            $stmt->Execute(array($bug_id, $user->user_id, time(), $body));
-            $this->comment_id = Bugdar::$db->LastInsertID();
+            $comment = new Comment();
+            $comment->bug_id       = $bug_id;
+            $comment->post_user_id = Bugdar::$auth->current_user();
+            $comment->post_date    = time();
+            $comment->body         = $body;
+            $comment->Insert();
+            $this->comment_id = $comment->comment_id;
 
             $search = new SearchEngine();
             $search->IndexBug($bug);
