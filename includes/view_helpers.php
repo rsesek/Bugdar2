@@ -63,3 +63,15 @@ function EventLink($event, $params = NULL)
 
     return $url;
 }
+
+// Renders a view by a given name and returns the result, for use in template
+// inclusion.  |$vars| is a map array of key-value pairs to act as variables in
+// the template.
+function InsertView($name, $vars = array())
+{
+    $template = new \phalanx\views\View($name);
+    foreach ($vars as $key => $value) {
+        $template->vars()->Set($key, $value);
+    }
+    return $template->Render();
+}
