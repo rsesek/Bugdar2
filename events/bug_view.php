@@ -57,19 +57,11 @@ class BugViewEvent extends phalanx\events\Event
 
     public function WillFire()
     {
-        $user       = Bugdar::$auth->current_user();
-        $can_view   = FALSE;
-        $usergroups = array();
-        if (!$user) {
-            $usergroups = array(Usergroup::AnonymousGroup());
-        } else {
-            $usergroups = $user->FetchUsergroups();
-        }
-        foreach ($usergroups as $usergroup) {
-            $can_view |= $usergroup->mask & Usergroup::CAN_VIEW;
-        }
-        if (!$can_view) {
+        $user = Bugdar::$auth->current_user();
+        if (($user && !$user->CheckGroupPermission(Usergroup::CAN_VIEW)) ||
+            (!$user && !Usergroup::AnonymousGroup()->mask & Usergroup::CAN_VIEW)) {
             EventPump::Pump()->RaiseEvent(new StandardErrorEvent('NO_PERMISSION_CAN_VIEW'));
+            return;
         }
     }
 

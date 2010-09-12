@@ -45,8 +45,19 @@ class Usergroup extends phalanx\data\Model
       const CAN_DELETE_REPORTS    = 1024;
     // }}
 
+    // Default, built-in roles {{
+      const ROLE_ANONYMOUS = 1;
+      const ROLE_REGISTERED = 2;
+      const ROLE_DEVELOPER = 3;
+      const ROLE_ADMINISTRATOR = 4;
+    // }}
+
     // Returns the Usergroup object that informs the permissions of all
     // unregistered users (guests).
     static public function AnonymousGroup()
-    {}
+    {
+        $group = new self(self::ROLE_ANONYMOUS);
+        $group->FetchInto();
+        return $group;
+    }
 }

@@ -62,3 +62,4 @@ CREATE TABLE usergroups
 	display_title varchar(100) NOT NULL DEFAULT '',
 	mask int unsigned NOT NULL DEFAULT 0
 ) ENGINE=InnoDB;
+INSERT INTO usergroups VALUES (1, 'Anonymous', 'Not Logged In', 1);

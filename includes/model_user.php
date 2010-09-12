@@ -60,4 +60,15 @@ class User extends phalanx\data\Model
             $group_list .= ',' . $this->other_usergroup_ids;
         return Usergroup::FetchGroup('usergroup_id IN (' . $group_list . ')');
     }
+
+    // Checks whether this user can access |$mask|.
+    public static function CheckGroupPermission($mask)
+    {
+        $groups = $this->FetchUsergroups();
+        $can_view = FALSE;
+        foreach ($groups as $group) {
+            $can_view |= $group->mask & $mask;
+        }
+        return $can_view;
+    }
 }
