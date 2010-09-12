@@ -16,6 +16,8 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/events/bug_list.php';
+
 // This is the default page that users get when they access Bugdar.
 class HomeEvent extends phalanx\events\Event
 {
@@ -31,14 +33,6 @@ class HomeEvent extends phalanx\events\Event
 
     public function Fire()
     {
-        $user = Bugdar::$auth->IsLoggedIn();
-        if ($user)
-        {
-            echo 'Hello, ' . $user->alias . ' &lt;' . $user->email . ' &gt;!';
-        }
-        else
-        {
-            echo 'Welcome, guest! Do you want to <a href="register_user">register</a>, or do you want to <a href="login_user">log in</a>?';
-        }
+        EventPump::Pump()->PostEvent(new BugListEvent());
     }
 }
