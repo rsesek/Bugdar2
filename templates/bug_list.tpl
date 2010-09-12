@@ -3,13 +3,13 @@
 <h1>Top 30 Recent Bugs</h1>
 <p>(This will get better, I assure you.)</p>
 
-<table border="1" cellspacing="2" cellpadding="5">
+<table id="bug-list">
     <tr>
         <th>ID</th>
         <th>Title</th>
         <th>Reporter</th>
         <th>Date</th>
-    </tr>
+    </tr>  
     <? foreach ($this->bugs as $bug): ?>
     <tr>
         <td><a href="<?= EventLink('BugView', $bug->bug_id) ?>"><?= Cleaner::HTML($bug->bug_id) ?></a></td>
