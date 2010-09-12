@@ -42,7 +42,7 @@ class Usergroup extends phalanx\data\Model
       const CAN_EDIT_ALL_COMMENTS = 128;
       const CAN_EDIT_REPORT       = 256;
       const CAN_DELETE_COMMENTS   = 512;
-      const CAN_DELTE_REPORTS     = 1024;
+      const CAN_DELETE_REPORTS    = 1024;
     // }}
 
     // Returns the Usergroup object that informs the permissions of all
