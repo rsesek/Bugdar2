@@ -63,3 +63,6 @@ CREATE TABLE usergroups
 	mask int unsigned NOT NULL DEFAULT 0
 ) ENGINE=InnoDB;
 INSERT INTO usergroups VALUES (1, 'Anonymous', 'Not Logged In', 1);
+INSERT INTO usergroups VALUES (2, 'Registered', 'Reporter', 15);
+INSERT INTO usergroups VALUES (3, 'Developers', 'Developer', 383);
+INSERT INTO usergroups VALUES (4, 'Administrators', 'Admin', 2047);

@@ -28,6 +28,7 @@ class Usergroup extends phalanx\data\Model
     protected $fields = array(
       'usergroup_id',
       'title',
+      'display_title',
       'mask'
     );
 

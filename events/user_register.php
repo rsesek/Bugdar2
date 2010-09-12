@@ -73,7 +73,7 @@ class UserRegisterEvent extends phalanx\events\Event
             $user->email        = $this->input->email;
             $user->alias        = preg_replace('/[^a-zA-Z0-9\-_,\. ]/', '', $this->input->alias);
             $user->password     = sha1($this->input->password);
-            $user->usergroup_id = 6;  // TODO: uhhh... usergroups. yea.
+            $user->usergroup_id = Usergroup::ROLE_REGISTERED;
             $user->Insert();
             $this->user_id = $user->user_id;
 
