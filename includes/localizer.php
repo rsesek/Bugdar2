@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
+require_once BUGDAR_ROOT . '/languages/en-US.php';
+
 class l10n
 {
     // Singleton instance.
@@ -22,18 +24,34 @@ class l10n
     // Histogram of missing strings.
     protected $missing_strings = array();
 
+    // The Language object.
+    protected $language = NULL;
+
     static public function S($string)
     {
-        return self::GetString($string);
+        return self::Instance()->GetString($string);
     }
 
-    static public function GetString($string)
+    protected function __construct()
     {
-        $self = self::Instance();
-        if (!isset($self->missing_strings[$string]))
-            $self->missing_strings[$string] = 0;
-        $self->missing_strings[$string]++;
-        return $string;
+        $this->language = new Language_en_US();
+    }
+
+    public function GetString($string)
+    {
+        $strings = $this->GetLanguage()->strings();
+        if (!isset($strings[$string])) {
+            if (!isset($this->missing_strings[$string]))
+                $this->missing_strings[$string] = 0;
+            $this->missing_strings[$string]++;
+            return $string;
+        }
+        return $strings[$string];
+    }
+
+    public function GetLanguage()
+    {
+        return $this->language;
     }
 
     // Getters and setters.

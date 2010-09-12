@@ -4,7 +4,7 @@ Header Template Variables:
 title - Used as the title of the web page.
 */?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= l10n::Instance()->GetLanguage()->code() ?>">
 <head>
   <title>$[title] - Bugdar 2 Beta 1</title>
   <link rel="stylesheet" href="<?= WebRoot() ?>css/reset.css" type="text/css" media="screen" />
