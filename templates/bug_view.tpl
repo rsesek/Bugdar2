@@ -1,3 +1,5 @@
+<? InsertView('header', array('title' => 'Bug #' . $this->bug->bug_id)) ?>
+
 <script type="text/javascript" src="<?= WebRoot('js/attributes.js') ?>"></script>
 
 <form action="<?= EventLink('BugEdit') ?>" method="post">
@@ -5,7 +7,7 @@
 
 <h1>Bug #$[bug.bug_id]: $[bug.title]</h1>
 
-<dl>
+<dl id="attributes">
     <dt>Reporter:</dt>
     <dd>$[bug_reporter.alias]</dd>
 
@@ -13,11 +15,7 @@
     <dd><?= gmdate('r', $this->bug->reporting_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></dd>
 </dl>
 
-<div><strong>Attributes</strong></div>
 <div><a href="javascript:AddAttribute()">Add Attribute</a></div>
-
-<dl id="attributes">
-</dl>
 
 <h2>Comments</h2>
 
@@ -41,3 +39,5 @@
 <? endforeach ?>
     AddAttribute();
 </script>
+
+<?= InsertView('footer') ?>

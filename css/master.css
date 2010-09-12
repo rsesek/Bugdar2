@@ -35,3 +35,7 @@ body {
 #bug-list tr:nth-child(even) {
   background-color: rgb(242, 242, 242);
 }
+
+#attributes dt {
+  float: left;
+}
