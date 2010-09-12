@@ -16,6 +16,7 @@
 
 use phalanx\events\EventPump as EventPump;
 
+require_once BUGDAR_ROOT . '/includes/model_attribute.php';
 require_once BUGDAR_ROOT . '/includes/model_bug.php';
 require_once BUGDAR_ROOT . '/includes/model_comment.php';
 require_once BUGDAR_ROOT . '/includes/search_engine.php';
@@ -93,7 +94,7 @@ class BugEditEvent extends phalanx\events\Event
             }
 
             // Get all potential attributes; this includes defined tags.
-            $attributes = Attributes::FetchGroup();
+            $attributes = Attribute::FetchGroup();
             foreach ($attributes as $attr) {
                 // If the user is allowed to write to this attribute, update the
                 // value.
