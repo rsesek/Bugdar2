@@ -5,6 +5,7 @@ body {
 
 #header {
   background-color: lightgray;
+  margin-bottom: 10px;
 }
 
 #userinfo {

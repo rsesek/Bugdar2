@@ -1,8 +1,5 @@
 <? InsertView('header', array('title' => l10n::S('BUG_LIST_TITLE'))) ?>
 
-<h1>Top 30 Recent Bugs</h1>
-<p>(This will get better, I assure you.)</p>
-
 <table id="bug-list">
     <tr>
         <th>ID</th>
