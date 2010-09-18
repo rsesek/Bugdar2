@@ -27,7 +27,10 @@ class Version
 
   static public function PresentationString()
   {
-    $string = sprintf('%d.%d.%d', self::Major, self::Minor, self::PatchLevel);
+    $string = sprintf('%d.%d', self::Major, self::Minor);
+    if (self::PatchLevel) {
+      $string = sprintf('%s.%d', $string, self::PatchLevel);
+    }
     if (self::Stage) {
       return sprintf('%s %s %d', $string, self::Stage, self::StageVersion);
     }
