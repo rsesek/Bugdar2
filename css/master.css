@@ -46,3 +46,45 @@ body {
 #attributes dt {
   float: left;
 }
+
+#settings {
+  width: 75%;
+  margin: auto;
+
+  background-color: rgb(204, 204, 204);
+  border-spacing: 1px;
+  border-collapse: separate;
+}
+
+#settings tr {
+  background-color: white;
+}
+
+#settings th {
+  text-align: left;
+  width: 35%;
+  padding: 3px;
+}
+
+#settings th label {
+  display: block;
+}
+
+#settings th dfn {
+  font-size: 10pt;
+  font-weight: normal;
+}
+
+#settings td {
+  vertical-align: middle;
+  text-align: center;
+  padding: 3px;
+}
+
+#settings td input {
+  font-size: 12pt;
+}
+
+#settings td input[type="text"] {
+  width: 80%;
+}

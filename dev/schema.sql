@@ -66,3 +66,9 @@ INSERT INTO usergroups VALUES (1, 'Anonymous', 'Not Logged In', 1);
 INSERT INTO usergroups VALUES (2, 'Registered', 'Reporter', 15);
 INSERT INTO usergroups VALUES (3, 'Developers', 'Developer', 383);
 INSERT INTO usergroups VALUES (4, 'Administrators', 'Admin', 2047);
+
+CREATE TABLE settings
+(
+	setting varchar(50) NOT NULL DEFAULT '' PRIMARY KEY,
+	value mediumtext NULL
+) ENGINE=InnoDB;

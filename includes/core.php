@@ -34,6 +34,9 @@ class Bugdar
   // The authentication system.
   static public $auth = NULL;
 
+  // The system settings.
+  static public $settings = array();
+
   // Bootstraps the database.
   static public function BootstrapDatabase($config)
   {
@@ -63,6 +66,15 @@ class Bugdar
     if (!class_exists($class_name))
       throw new CoreException('Could not find class ' . $class_name);
     self::$auth = new $class_name($config->auth);
+  }
+
+  // Fetches the settings from the database.
+  static public function LoadSettings()
+  {
+    $query = self::$db->Query("SELECT * FROM " . TABLE_PREFIX . "settings");
+    while ($row = $query->FetchObject()) {
+      self::$settings[$row->setting] = $row->value;
+    }
   }
 }
 

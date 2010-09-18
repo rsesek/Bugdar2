@@ -76,6 +76,7 @@ $config = new phalanx\base\KeyDescender(require $config_path);
 // Setup common functionality.
 Bugdar::BootstrapDatabase($config);
 Bugdar::BootstrapAuthentication($config);
+Bugdar::LoadSettings();
 
 // Finally, begin processing events.
 $dispatcher->Start();

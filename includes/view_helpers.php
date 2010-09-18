@@ -21,8 +21,7 @@ use phalanx\data\Cleaner as Cleaner;
 // Returns the web root URL().
 function WebRoot($params = NULL)
 {
-  // BUG:K002 : view_helpers.php WebRoot() uses a hard-coded path
-  $url = '/greenfield/';
+  $url = Bugdar::$settings['webroot'];
   if (!$params)
     return $url;
   return $url . $params;
@@ -33,8 +32,7 @@ function WebRoot($params = NULL)
 function EventLink($event, $params = NULL)
 {
   // Determine the base URL.
-  // BUG:K001 : view_helpers.php EventLink() uses a hard-coded path
-  $url = '/greenfield/';
+  $url = Bugdar::$settings['webroot'];
 
   // Use the ViewOutputHandler's closure to convert the class name to viewese.
   // We then reverse new_comment to get comment_new.
