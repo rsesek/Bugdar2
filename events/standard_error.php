@@ -16,34 +16,34 @@
 
 class StandardErrorEvent extends phalanx\events\Event
 {
-    // The error message.
-    protected $message;
+  // The error message.
+  protected $message;
 
-    static public function InputList()
-    {
-        return array();
-    }
+  static public function InputList()
+  {
+    return array();
+  }
 
-    static public function OutputList()
-    {
-        return array('message');
-    }
+  static public function OutputList()
+  {
+    return array('message');
+  }
 
-    public function __construct($message)
-    {
-        $this->message = $message;
-    }
+  public function __construct($message)
+  {
+    $this->message = $message;
+  }
 
-    public function Fire()
-    {
-        phalanx\events\EventPump::Pump()->CancelDeferredEvents();
-    }
+  public function Fire()
+  {
+    phalanx\events\EventPump::Pump()->CancelDeferredEvents();
+  }
 
-    public function Cleanup()
-    {
-        phalanx\events\EventPump::Pump()->StopPump();
-    }
+  public function Cleanup()
+  {
+    phalanx\events\EventPump::Pump()->StopPump();
+  }
 
-    // Getter.
-    public function message() { return $this->message; }
+  // Getter.
+  public function message() { return $this->message; }
 }

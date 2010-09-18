@@ -19,35 +19,35 @@
 // with a flash message. This is the complement to StandardErrorEvent.
 class StandardSuccessEvent extends phalanx\events\Event
 {
-    // The place we are redirecting to.
-    protected $location;
+  // The place we are redirecting to.
+  protected $location;
 
-    // The success message.
-    protected $message;
+  // The success message.
+  protected $message;
 
-    static public function InputList()
-    {
-        return array();
-    }
+  static public function InputList()
+  {
+    return array();
+  }
 
-    static public function OutputList()
-    {
-        return array('message');
-    }
+  static public function OutputList()
+  {
+    return array('message');
+  }
 
-    public function __construct($location, $message)
-    {
-        $this->location = $location;
-        $this->message  = $message;
-    }
+  public function __construct($location, $message)
+  {
+    $this->location = $location;
+    $this->message  = $message;
+  }
 
-    public function Fire()
-    {
-        header("Location: {$this->location}");
-        phalanx\events\EventPump::Pump()->Terminate();
-    }
+  public function Fire()
+  {
+    header("Location: {$this->location}");
+    phalanx\events\EventPump::Pump()->Terminate();
+  }
 
-    // Getters.
-    public function location() { return $this->location; }
-    public function message() { return $this->message; }
+  // Getters.
+  public function location() { return $this->location; }
+  public function message() { return $this->message; }
 }

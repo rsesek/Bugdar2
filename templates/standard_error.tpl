@@ -1,6 +1,6 @@
 <style>
 body {
-    color: red;
+  color: red;
 }
 </style>
 

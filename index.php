@@ -39,20 +39,17 @@ $pump->set_output_handler($view_handler);
 // user_register, it's register_user. After reversing the components, events
 // are loaded from the events/ directory. The class name is the CammelCase
 // version of the underscored name, suffixed by the word 'Event'.
-$dispatcher->set_event_loader(
-    function($name)
-    {
-        $name  = preg_replace('/[^a-z0-9_\-\.]/i', '', $name);
-        $parts = explode('_', $name);
-        $parts = array_reverse($parts);
-        $name  = implode('_', $parts);
-        $path = "./events/$name.php";
-        if (!file_exists($path))
-            phalanx\events\EventPump::Pump()->RaiseEvent(new StandardErrorEvent('Could not load event ' . $name));
-        require_once $path;
-        return phalanx\base\UnderscoreToCamelCase($name) . 'Event';
-    }
-);
+$dispatcher->set_event_loader(function($name) {
+  $name  = preg_replace('/[^a-z0-9_\-\.]/i', '', $name);
+  $parts = explode('_', $name);
+  $parts = array_reverse($parts);
+  $name  = implode('_', $parts);
+  $path = "./events/$name.php";
+  if (!file_exists($path))
+    phalanx\events\EventPump::Pump()->RaiseEvent(new StandardErrorEvent('Could not load event ' . $name));
+  require_once $path;
+  return phalanx\base\UnderscoreToCamelCase($name) . 'Event';
+});
 
 // Register bypass rules.
 $dispatcher->AddBypassRule('',       'home');
@@ -65,18 +62,15 @@ $dispatcher->AddBypassRule('logout', 'logout_user');
 // Transform the event name into a template name.
 phalanx\views\View::set_template_path(dirname(__FILE__) . '/templates/%s.tpl');
 phalanx\views\View::set_cache_path(dirname(__FILE__) . '/cache');
-$view_handler->set_template_loader(
-    function($event_class)
-    {
-        $name = preg_replace('/Event$/', '', $event_class);
-        return phalanx\base\CamelCaseToUnderscore($name);
-    }
-);
+$view_handler->set_template_loader(function($event_class) {
+  $name = preg_replace('/Event$/', '', $event_class);
+  return phalanx\base\CamelCaseToUnderscore($name);
+});
 
 // Read the configuration file.
 $config_path = BUGDAR_ROOT . '/includes/config.php';
 if (!file_exists($config_path) || !is_readable($config_path))
-    throw new CoreException('Could not read configuration file');
+  throw new CoreException('Could not read configuration file');
 $config = new phalanx\base\KeyDescender(require $config_path);
 
 // Setup common functionality.
@@ -85,14 +79,11 @@ Bugdar::BootstrapAuthentication($config);
 
 // Finally, begin processing events.
 $dispatcher->Start();
-try
-{    
-    $pump->StopPump();
-}
-catch (phalanx\views\ViewException $e)
-{
-    // We got a view exception, meaning a template couldn't be loaded. If we
-    // have any output on the buffer, let it slide. Otherwise, re-throw.
-    if (strlen(ob_get_contents()) <= 0)
-        throw $e;
+try {  
+  $pump->StopPump();
+} catch (phalanx\views\ViewException $e) {
+  // We got a view exception, meaning a template couldn't be loaded. If we
+  // have any output on the buffer, let it slide. Otherwise, re-throw.
+  if (strlen(ob_get_contents()) <= 0)
+    throw $e;
 }

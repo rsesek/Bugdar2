@@ -18,49 +18,49 @@ require_once BUGDAR_ROOT . '/languages/en-US.php';
 
 class l10n
 {
-    // Singleton instance.
-    static private $instance = NULL;
+  // Singleton instance.
+  static private $instance = NULL;
 
-    // Histogram of missing strings.
-    protected $missing_strings = array();
+  // Histogram of missing strings.
+  protected $missing_strings = array();
 
-    // The Language object.
-    protected $language = NULL;
+  // The Language object.
+  protected $language = NULL;
 
-    static public function S($string)
-    {
-        return self::Instance()->GetString($string);
+  static public function S($string)
+  {
+    return self::Instance()->GetString($string);
+  }
+
+  protected function __construct()
+  {
+    $this->language = new Language_en_US();
+  }
+
+  public function GetString($string)
+  {
+    $strings = $this->GetLanguage()->strings();
+    if (!isset($strings[$string])) {
+      if (!isset($this->missing_strings[$string]))
+        $this->missing_strings[$string] = 0;
+      $this->missing_strings[$string]++;
+      return $string;
     }
+    return $strings[$string];
+  }
 
-    protected function __construct()
-    {
-        $this->language = new Language_en_US();
-    }
+  public function GetLanguage()
+  {
+    return $this->language;
+  }
 
-    public function GetString($string)
-    {
-        $strings = $this->GetLanguage()->strings();
-        if (!isset($strings[$string])) {
-            if (!isset($this->missing_strings[$string]))
-                $this->missing_strings[$string] = 0;
-            $this->missing_strings[$string]++;
-            return $string;
-        }
-        return $strings[$string];
-    }
-
-    public function GetLanguage()
-    {
-        return $this->language;
-    }
-
-    // Getters and setters.
-    // ------------------------------------------------------------------------
-    static public function Instance()
-    {
-        if (!self::$instance)
-            self::$instance = new l10n();
-        return self::$instance;
-    }
-    static public function set_instance(l10n $instance) { self::$instance = $instance; }
+  // Getters and setters.
+  // ------------------------------------------------------------------------
+  static public function Instance()
+  {
+    if (!self::$instance)
+      self::$instance = new l10n();
+    return self::$instance;
+  }
+  static public function set_instance(l10n $instance) { self::$instance = $instance; }
 }

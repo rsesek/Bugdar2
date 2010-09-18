@@ -19,26 +19,26 @@ use phalanx\events\EventPump as EventPump;
 // This event allows viewing of a user profile.
 class UserViewEvent extends phalanx\events\Event
 {
-    protected $user = NULL;
-    public function user() { return $this->user; }
+  protected $user = NULL;
+  public function user() { return $this->user; }
 
-    static public function InputList()
-    {
-        return array(
-            '_id'
-        );
-    }
+  static public function InputList()
+  {
+    return array(
+      '_id'
+    );
+  }
 
-    static public function OutputList()
-    {
-        return array('user');
-    }
+  static public function OutputList()
+  {
+    return array('user');
+  }
 
-    public function Fire()
-    {
-        $stmt = Bugdar::$db->Prepare("SELECT * FROM " . TABLE_PREFIX . "users WHERE user_id = :id OR alias = :id");
-        $stmt->Execute(array('id' => $this->input->_id));
-        if (!($this->user = $stmt->FetchObject()))
-            EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('INVALID_USER')));
-    }
+  public function Fire()
+  {
+    $stmt = Bugdar::$db->Prepare("SELECT * FROM " . TABLE_PREFIX . "users WHERE user_id = :id OR alias = :id");
+    $stmt->Execute(array('id' => $this->input->_id));
+    if (!($this->user = $stmt->FetchObject()))
+      EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('INVALID_USER')));
+  }
 }

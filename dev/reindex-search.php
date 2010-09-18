@@ -40,10 +40,9 @@ echo 'New index created' . "\n";
 $search = new SearchEngine();
 
 $bugs = Bugdar::$db->Query("SELECT * FROM " . TABLE_PREFIX . "bugs");
-while ($bug = $bugs->FetchObject())
-{
-    $search->IndexBug($bug);
-    echo ".";
+while ($bug = $bugs->FetchObject()) {
+  $search->IndexBug($bug);
+  echo ".";
 }
 
 echo "\nDone!\n";

@@ -18,25 +18,25 @@ use phalanx\events\EventPump as EventPump;
 
 class UserLogoutEvent extends phalanx\events\Event
 {
-    static public function InputList()
-    {
-        return array();
-    }
+  static public function InputList()
+  {
+    return array();
+  }
 
-    static public function OutputList()
-    {
-        return array();
-    }
+  static public function OutputList()
+  {
+    return array();
+  }
 
-    public function WillFire()
-    {
-        if (!Bugdar::$auth->IsLoggedIn())
-            $this->Cancel();
-    }
+  public function WillFire()
+  {
+    if (!Bugdar::$auth->IsLoggedIn())
+      $this->Cancel();
+  }
 
-    public function Fire()
-    {
-        Bugdar::$auth->Logout();
-        EventPump::Pump()->PostEvent(new StandardSuccessEvent('home', l10n::S('LOGOUT_SUCCESS')));
-    }
+  public function Fire()
+  {
+    Bugdar::$auth->Logout();
+    EventPump::Pump()->PostEvent(new StandardSuccessEvent('home', l10n::S('LOGOUT_SUCCESS')));
+  }
 }

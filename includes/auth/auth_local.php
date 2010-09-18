@@ -22,35 +22,35 @@ require_once BUGDAR_ROOT . '/events/user_login.php';
 // suitable for almost everyone.
 class AuthenticationLocal extends Authentication
 {
-    public function IsLoggedIn()
-    {
-        if ($this->current_user())
-            return $this->current_user();
+  public function IsLoggedIn()
+  {
+    if ($this->current_user())
+      return $this->current_user();
 
-        $user = new User($_COOKIE['bugdar_user']);
-        try {
-            $user->FetchInto();
-        }
-        catch (phalanx\data\ModelException $e) {
-            return FALSE;
-        }
-
-        if ($user->authkey != $_COOKIE['bugdar_pass'])
-            return FALSE;
-
-        $this->current_user = $user;
-        return $this->current_user;
+    $user = new User($_COOKIE['bugdar_user']);
+    try {
+      $user->FetchInto();
+    }
+    catch (phalanx\data\ModelException $e) {
+      return FALSE;
     }
 
-    protected function _PerformLogin()
-    {
-        phalanx\events\EventPump::Pump()->RaiseEvent(new UserLoginEvent());
-        phalanx\events\EventPump::Pump()->StopPump();
-    }
+    if ($user->authkey != $_COOKIE['bugdar_pass'])
+      return FALSE;
 
-    protected function _PerformLogout()
-    {
-        setcookie('bugdar_user');
-        setcookie('bugdar_pass');
-    }
+    $this->current_user = $user;
+    return $this->current_user;
+  }
+
+  protected function _PerformLogin()
+  {
+    phalanx\events\EventPump::Pump()->RaiseEvent(new UserLoginEvent());
+    phalanx\events\EventPump::Pump()->StopPump();
+  }
+
+  protected function _PerformLogout()
+  {
+    setcookie('bugdar_user');
+    setcookie('bugdar_pass');
+  }
 }

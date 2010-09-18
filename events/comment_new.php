@@ -23,57 +23,57 @@ require_once BUGDAR_ROOT . '/includes/search_engine.php';
 // This event creates a new comment on a bug.
 class CommentNewEvent extends phalanx\events\Event
 {
-    protected $comment_id = 0;
-    public function comment_id() { return $this->comment_id; }
+  protected $comment_id = 0;
+  public function comment_id() { return $this->comment_id; }
 
-    static public function InputList()
-    {
-        return array(
-            'do',
-            'bug_id',
-            'body',
-        );
+  static public function InputList()
+  {
+    return array(
+      'do',
+      'bug_id',
+      'body',
+    );
+  }
+
+  static public function OutputList()
+  {
+    return array('comment_id');
+  }
+
+  public function WillFire()
+  {
+    Bugdar::$auth->RequireAuthentication();
+  }
+
+  public function Fire()
+  {
+    if ($this->input->do == 'submit') {
+      $bug = new Bug($this->input->bug_id);
+      try {
+        $bug->FetchInto();
+      } catch (phalanx\data\ModelException $e) {
+        EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_ID_NOT_FOUND')));
+        return;
+      }
+
+      $body = trim($this->input->body);
+      if (empty($body)) {
+        EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('COMMENT_MISSING_BODY')));
+        return;
+      }
+
+      $comment = new Comment();
+      $comment->bug_id       = $bug_id;
+      $comment->post_user_id = Bugdar::$auth->current_user();
+      $comment->post_date    = time();
+      $comment->body         = $body;
+      $comment->Insert();
+      $this->comment_id = $comment->comment_id;
+
+      $search = new SearchEngine();
+      $search->IndexBug($bug);
+
+      EventPump::Pump()->PostEvent(new StandardSuccessEvent('view_bug/' . $bug_id, l10n::S('USER_REGISTER_SUCCESS')));
     }
-
-    static public function OutputList()
-    {
-        return array('comment_id');
-    }
-
-    public function WillFire()
-    {
-        Bugdar::$auth->RequireAuthentication();
-    }
-
-    public function Fire()
-    {
-        if ($this->input->do == 'submit') {
-            $bug = new Bug($this->input->bug_id);
-            try {
-                $bug->FetchInto();
-            } catch (phalanx\data\ModelException $e) {
-                EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_ID_NOT_FOUND')));
-                return;
-            }
-
-            $body = trim($this->input->body);
-            if (empty($body)) {
-                EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('COMMENT_MISSING_BODY')));
-                return;
-            }
-
-            $comment = new Comment();
-            $comment->bug_id       = $bug_id;
-            $comment->post_user_id = Bugdar::$auth->current_user();
-            $comment->post_date    = time();
-            $comment->body         = $body;
-            $comment->Insert();
-            $this->comment_id = $comment->comment_id;
-
-            $search = new SearchEngine();
-            $search->IndexBug($bug);
-
-            EventPump::Pump()->PostEvent(new StandardSuccessEvent('view_bug/' . $bug_id, l10n::S('USER_REGISTER_SUCCESS')));
-        }
-    }
+  }
 }

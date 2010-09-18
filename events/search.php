@@ -20,58 +20,56 @@ require_once BUGDAR_ROOT . '/includes/search_engine.php';
 
 class SearchEvent extends phalanx\events\Event
 {
-    protected $hits = array();
-    public function hits() { return $this->hits; }
+  protected $hits = array();
+  public function hits() { return $this->hits; }
 
-    static public function InputList()
+  static public function InputList()
+  {
+    return array(
+      'do',
+      'query_string',
+    );
+  }
+
+  static public function OutputList()
+  {
+    return array(
+      'hits'
+    );
+  }
+
+  public function Fire()
+  {
+    if ($this->input->do == 'search')
     {
-        return array(
-            'do',
-            'query_string',
-        );
+      $search  = new SearchEngine();
+      $results = $search->SearchByQueryString($this->input->query_string);
+
+      $hits  = array();
+      $id_list = array();
+      foreach ($results as $result) {
+        $hits[$result->bug_id] = $result;
+        $id_list[] = $result->bug_id;
+      }
+
+      if (count($id_list) < 1)
+        return;
+
+      $bugs = Bugdar::$db->Query("
+        SELECT bugs.*, users.alias as reporting_alias
+        FROM " . TABLE_PREFIX . "bugs bugs
+        LEFT JOIN " . TABLE_PREFIX . "users users
+          ON (bugs.reporting_user_id = users.user_id)
+        WHERE bugs.bug_id IN (" . implode(',', $id_list) . ")
+        LIMIT 30
+      ");
+      while ($bug = $bugs->FetchObject()) {
+        $lucene_hit = $hits[$bug->bug_id];
+        $hits[$bug->bug_id] = $bug;
+        $hits[$bug->bug_id]->lucene_hit = $lucene_hit;
+        $hits[$bug->bug_id]->score      = $lucene_hit->score;
+      }
+      $this->hits = $hits;
     }
-
-    static public function OutputList()
-    {
-        return array(
-            'hits'
-        );
-    }
-
-    public function Fire()
-    {
-        if ($this->input->do == 'search')
-        {
-            $search  = new SearchEngine();
-            $results = $search->SearchByQueryString($this->input->query_string);
-
-            $hits    = array();
-            $id_list = array();
-            foreach ($results as $result)
-            {
-                $hits[$result->bug_id] = $result;
-                $id_list[] = $result->bug_id;
-            }
-
-            if (count($id_list) < 1)
-                return;
-
-            $bugs = Bugdar::$db->Query("
-                SELECT bugs.*, users.alias as reporting_alias
-                FROM " . TABLE_PREFIX . "bugs bugs
-                LEFT JOIN " . TABLE_PREFIX . "users users
-                    ON (bugs.reporting_user_id = users.user_id)
-                WHERE bugs.bug_id IN (" . implode(',', $id_list) . ")
-                LIMIT 30
-            ");
-            while ($bug = $bugs->FetchObject())
-            {
-                $lucene_hit = $hits[$bug->bug_id];
-                $hits[$bug->bug_id] = $bug;
-                $hits[$bug->bug_id]->lucene_hit = $lucene_hit;
-                $hits[$bug->bug_id]->score      = $lucene_hit->score;
-            }
-            $this->hits = $hits;
-        }
-    }
+  }
 }

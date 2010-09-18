@@ -8,11 +8,11 @@
 <h1>Bug #$[bug.bug_id]: $[bug.title]</h1>
 
 <dl id="attributes">
-    <dt>Reporter:</dt>
-    <dd>$[bug_reporter.alias]</dd>
+  <dt>Reporter:</dt>
+  <dd>$[bug_reporter.alias]</dd>
 
-    <dt>Date:</dt>
-    <dd><?= gmdate('r', $this->bug->reporting_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></dd>
+  <dt>Date:</dt>
+  <dd><?= gmdate('r', $this->bug->reporting_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></dd>
 </dl>
 
 <div><a href="javascript:AddAttribute()">Add Attribute</a></div>
@@ -21,8 +21,8 @@
 
 <? foreach ($this->comments as $comment): ?>
 <div>
-    <strong>Posted by <a href="<?= EventLink('UserView', $comment->post_alias) ?>"><?= Cleaner::HTML($comment->post_alias) ?></a> on <?= gmdate('r', $comment->post_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></strong>
-    <p><?= Cleaner::HTML($comment->body) ?></p>
+  <strong>Posted by <a href="<?= EventLink('UserView', $comment->post_alias) ?>"><?= Cleaner::HTML($comment->post_alias) ?></a> on <?= gmdate('r', $comment->post_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></strong>
+  <p><?= Cleaner::HTML($comment->body) ?></p>
 </div>
 <? endforeach ?>
 
@@ -35,9 +35,9 @@
 
 <script type="text/javascript" charset="utf-8">
 <? foreach ($this->attributes as $attr): ?>
-    AddAttribute("<?= Cleaner::HTML($attr->attribute_title) ?>", "<?= Cleaner::HTML($attr->value) ?>");
+  AddAttribute("<?= Cleaner::HTML($attr->attribute_title) ?>", "<?= Cleaner::HTML($attr->value) ?>");
 <? endforeach ?>
-    AddAttribute();
+  AddAttribute();
 </script>
 
 <?= InsertView('footer') ?>

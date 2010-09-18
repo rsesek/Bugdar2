@@ -21,47 +21,47 @@ use phalanx\data\Cleaner as Cleaner;
 // Returns the web root URL().
 function WebRoot($params = NULL)
 {
-    // BUG:K002 : view_helpers.php WebRoot() uses a hard-coded path
-    $url = '/greenfield/';
-    if (!$params)
-        return $url;
-    return $url . $params;
+  // BUG:K002 : view_helpers.php WebRoot() uses a hard-coded path
+  $url = '/greenfield/';
+  if (!$params)
+    return $url;
+  return $url . $params;
 }
 
 // This creates a link to another event. This should be an event class name (in
 // camel case and all). The params will be passed via a GET URL.
 function EventLink($event, $params = NULL)
 {
-    // Determine the base URL.
-    // BUG:K001 : view_helpers.php EventLink() uses a hard-coded path
-    $url = '/greenfield/';
+  // Determine the base URL.
+  // BUG:K001 : view_helpers.php EventLink() uses a hard-coded path
+  $url = '/greenfield/';
 
-    // Use the ViewOutputHandler's closure to convert the class name to viewese.
-    // We then reverse new_comment to get comment_new.
-    $f = EventPump::Pump()->output_handler()->template_loader();
-    $parts = explode('_', $f($event));
-    $parts = array_reverse($parts);
-    $url .= implode('_', $parts);
+  // Use the ViewOutputHandler's closure to convert the class name to viewese.
+  // We then reverse new_comment to get comment_new.
+  $f = EventPump::Pump()->output_handler()->template_loader();
+  $parts = explode('_', $f($event));
+  $parts = array_reverse($parts);
+  $url .= implode('_', $parts);
 
-    // Append parameters.
-    if ($params !== NULL)
+  // Append parameters.
+  if ($params !== NULL)
+  {
+    if (KeyDescender::IsDescendable($params))
     {
-        if (KeyDescender::IsDescendable($params))
-        {
-            foreach ($params as $key => $value)
-            {
-                $url .= '/' . Cleaner::HTML($key) . '/' . Cleaner::HTML($value);
-            }
-        }
-        else
-        {
-            // This is a single-value type. HTML encode it and append it as the _id
-            // parameter.
-            $url .= '/' . Cleaner::HTML($params);
-        }
+      foreach ($params as $key => $value)
+      {
+        $url .= '/' . Cleaner::HTML($key) . '/' . Cleaner::HTML($value);
+      }
     }
+    else
+    {
+      // This is a single-value type. HTML encode it and append it as the _id
+      // parameter.
+      $url .= '/' . Cleaner::HTML($params);
+    }
+  }
 
-    return $url;
+  return $url;
 }
 
 // Renders a view by a given name and returns the result, for use in template
@@ -69,9 +69,9 @@ function EventLink($event, $params = NULL)
 // the template.
 function InsertView($name, $vars = array())
 {
-    $template = new \phalanx\views\View($name);
-    foreach ($vars as $key => $value) {
-        $template->vars()->Set($key, $value);
-    }
-    return $template->Render();
+  $template = new \phalanx\views\View($name);
+  foreach ($vars as $key => $value) {
+    $template->vars()->Set($key, $value);
+  }
+  return $template->Render();
 }

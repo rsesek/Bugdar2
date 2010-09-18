@@ -28,49 +28,49 @@
 // currently in the alpha stage of development. YOU HAVE BEEN WARNED.
 abstract class Authentication
 {
-    // The auth section of the config file.
-    protected $auth_config = NULL;
+  // The auth section of the config file.
+  protected $auth_config = NULL;
 
-    // The currently logged-in user.
-    protected $current_user = NULL;
+  // The currently logged-in user.
+  protected $current_user = NULL;
 
-    public function __construct(Array $config)
-    {
-        $this->auth_config = $config;
-    }
+  public function __construct(Array $config)
+  {
+    $this->auth_config = $config;
+  }
 
-    // Should return FALSE if there is not a logged in user, or the user's
-    // information dictionary in |$this->current_user|. Implementers are
-    // responsible for setting that variable properly.
-    abstract public function IsLoggedIn();
+  // Should return FALSE if there is not a logged in user, or the user's
+  // information dictionary in |$this->current_user|. Implementers are
+  // responsible for setting that variable properly.
+  abstract public function IsLoggedIn();
 
-    // Callers can use this to put up a login page if the user is not logged
-    // in. This is a forceful version of IsLoggedIn().
-    public function RequireAuthentication()
-    {
-        if ($this->IsLoggedIn())
-            return $this->current_user();
-        $this->_PerformLogin();
-    }
+  // Callers can use this to put up a login page if the user is not logged
+  // in. This is a forceful version of IsLoggedIn().
+  public function RequireAuthentication()
+  {
+    if ($this->IsLoggedIn())
+      return $this->current_user();
+    $this->_PerformLogin();
+  }
 
-    // Public wrapper around _PerformLogout() that NULLs |$this->current_user|.
-    public function Logout()
-    {
-        $this->current_user = NULL;
-        $this->_PerformLogout();
-    }
+  // Public wrapper around _PerformLogout() that NULLs |$this->current_user|.
+  public function Logout()
+  {
+    $this->current_user = NULL;
+    $this->_PerformLogout();
+  }
 
-    // Implementers should perform whatever login task they want here. You
-    // could redirect off-site, access a different database, read a text file,
-    // or anything else. Be sure to END EXECUTION in this function to prevent
-    // unauthorized access. You are not required to set |$this->current_user|.
-    abstract protected function _PerformLogin();
+  // Implementers should perform whatever login task they want here. You
+  // could redirect off-site, access a different database, read a text file,
+  // or anything else. Be sure to END EXECUTION in this function to prevent
+  // unauthorized access. You are not required to set |$this->current_user|.
+  abstract protected function _PerformLogin();
 
-    // This should clear whatever login cookies or session information has been
-    // set. Do not interrupt execution from within this method.
-    abstract protected function _PerformLogout();
+  // This should clear whatever login cookies or session information has been
+  // set. Do not interrupt execution from within this method.
+  abstract protected function _PerformLogout();
 
-    // Getters.
-    // ------------------------------------------------------------------------
-    public function current_user() { return $this->current_user; }
+  // Getters.
+  // ------------------------------------------------------------------------
+  public function current_user() { return $this->current_user; }
 }

@@ -18,23 +18,23 @@ return array(
 
 // Database configuration.
 'database' => array(
-    // The database source name string. See
-    // <http://us2.php.net/manual/en/pdo.construct.php> for the format of this.
-    'dsn'       => 'mysql:dbname=bugdar;host=localhost',
+  // The database source name string. See
+  // <http://us2.php.net/manual/en/pdo.construct.php> for the format of this.
+  'dsn'       => 'mysql:dbname=bugdar;host=localhost',
 
-    // The username and password for the database.
-    'username'  => 'mysql',
-    'password'  => 's3cret',
+  // The username and password for the database.
+  'username'  => 'mysql',
+  'password'  => 's3cret',
 
-    // The prefix to attach to all tables in the database.
-    'prefix'    => ''
+  // The prefix to attach to all tables in the database.
+  'prefix'    => ''
 ),
 
 // Authentication provider configuration.
 'auth' => array(
-    // The authentication module to use from includes/auth. Use 'local' to
-    // use the built-in Bugdar user database.
-    'module'    => 'local'
+  // The authentication module to use from includes/auth. Use 'local' to
+  // use the built-in Bugdar user database.
+  'module'  => 'local'
 ),
 
 );

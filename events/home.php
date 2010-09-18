@@ -21,18 +21,18 @@ require_once BUGDAR_ROOT . '/events/bug_list.php';
 // This is the default page that users get when they access Bugdar.
 class HomeEvent extends phalanx\events\Event
 {
-    static public function InputList()
-    {
-        return array();
-    }
+  static public function InputList()
+  {
+    return array();
+  }
 
-    static public function OutputList()
-    {
-        return array();
-    }
+  static public function OutputList()
+  {
+    return array();
+  }
 
-    public function Fire()
-    {
-        EventPump::Pump()->PostEvent(new BugListEvent());
-    }
+  public function Fire()
+  {
+    EventPump::Pump()->PostEvent(new BugListEvent());
+  }
 }

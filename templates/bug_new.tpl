@@ -4,11 +4,11 @@
 <input type="hidden" name="do" value="submit" />
 
 <dl>
-    <dt>Title:</dt>
-    <dd><input type="text" name="title" value="" id="title"></dd>
+  <dt>Title:</dt>
+  <dd><input type="text" name="title" value="" id="title"></dd>
 
-    <dt>Description:</dt>
-    <dd><textarea name="comment_body" rows="8" cols="40"></textarea></dd>
+  <dt>Description:</dt>
+  <dd><textarea name="comment_body" rows="8" cols="40"></textarea></dd>
 </dl>
 
 <p><input type="submit" value="Continue &rarr;"></p>

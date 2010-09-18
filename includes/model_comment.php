@@ -18,19 +18,19 @@ require_once PHALANX_ROOT . '/data/model.php';
 
 class Comment extends phalanx\data\Model
 {
-    // Model properties.
-    protected $table_prefix = TABLE_PREFIX;
-    protected $table = 'comments';
-    protected $primary_key = 'comment_id';
-    protected $condition = 'comment_id = :comment_id';
+  // Model properties.
+  protected $table_prefix = TABLE_PREFIX;
+  protected $table = 'comments';
+  protected $primary_key = 'comment_id';
+  protected $condition = 'comment_id = :comment_id';
 
-    // Struct properties.
-    protected $fields = array(
-    	'comment_id',
-    	'bug_id',
-    	'post_user_id',
-    	'post_date',
-    	'hidden',
-    	'body'
-    );
+  // Struct properties.
+  protected $fields = array(
+  	'comment_id',
+  	'bug_id',
+  	'post_user_id',
+  	'post_date',
+  	'hidden',
+  	'body'
+  );
 }

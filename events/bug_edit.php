@@ -24,100 +24,100 @@ require_once BUGDAR_ROOT . '/includes/search_engine.php';
 // This event creates a new comment on a bug.
 class BugEditEvent extends phalanx\events\Event
 {
-    static public function InputList()
-    {
-        return array(
-            'bug_id',
-            'comment_body',
-            'attributes',
-            'tags_new',
-            'tags_deleted'
-        );
+  static public function InputList()
+  {
+    return array(
+      'bug_id',
+      'comment_body',
+      'attributes',
+      'tags_new',
+      'tags_deleted'
+    );
+  }
+
+  static public function OutputList()
+  {
+    return array();
+  }
+
+  public function WillFire()
+  {
+    Bugdar::$auth->RequireAuthentication();
+  }
+
+  public function Fire()
+  {
+    $bug  = new Bug($this->input->bug_id);
+    $user = Bugdar::$auth->current_user();
+
+    try {
+      $bug->FetchInto();
+    } catch (\phalanx\data\ModelException $e) {
+      EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_ID_NOT_FOUND')));
+      return;
     }
 
-    static public function OutputList()
-    {
-        return array();
+    Bugdar::$db->BeginTransaction();
+
+    // Add a comment if one is present.
+    $body = trim($this->input->comment_body);
+    if (!empty($body)) {
+      $comment = new Comment();
+      $comment->bug_id     = $bug->bug_id;
+      $comment->post_user_id = $user->user_id;
+      $comment->post_date  = time();
+      $comment->body     = $body;
+      $comment->Insert();
     }
 
-    public function WillFire()
-    {
-        Bugdar::$auth->RequireAuthentication();
+    // Handle tags.
+    if (is_array($this->input->tags_new)) {
+      foreach ($this->input->tags_new as $tag) {
+        $bug->SetAttribute('', $tag);
+      }
+    }
+    if (is_array($this->input->tags_deleted)) {
+      foreach ($this->input->tags_deleted as $tag) {
+        $bug->RemoveAttribute($tag, TRUE);
+      }
     }
 
-    public function Fire()
-    {
-        $bug  = new Bug($this->input->bug_id);
-        $user = Bugdar::$auth->current_user();
-
-        try {
-            $bug->FetchInto();
-        } catch (\phalanx\data\ModelException $e) {
-            EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_ID_NOT_FOUND')));
-            return;
+    // Create a map of all the set attributes.
+    $set_attributes = array();
+    if (is_array($this->input->attributes)) {
+      foreach ($this->input->attributes as $attr) {
+        // If this is an empty attribute, ignore it.
+        if (empty($attr['title']) || empty($attr['value'])) {
+          continue;
         }
+        $set_attributes[$attr['title']] = $attr['value'];
+      }
 
-        Bugdar::$db->BeginTransaction();
+      // Get all potential attributes; this includes defined tags.
+      $attributes = Attribute::FetchGroup();
+      foreach ($attributes as $attr) {
+        // If the user is allowed to write to this attribute, update the
+        // value.
+        if ($attr->is_attribute() && $attr->CheckAccess($user, $bug) & Attribute::ACCESS_WRITE) {
+          // If there is no value for this attribute, then it was removed.
+          if (!isset($set_attributes[$attr->title])) {
+            $bug->RemoveAttribute($attr->title, $attr->is_tag());
+          }
 
-        // Add a comment if one is present.
-        $body = trim($this->input->comment_body);
-        if (!empty($body)) {
-            $comment = new Comment();
-            $comment->bug_id       = $bug->bug_id;
-            $comment->post_user_id = $user->user_id;
-            $comment->post_date    = time();
-            $comment->body         = $body;
-            $comment->Insert();
+          // Otherwise, update the value.
+          $validate = $attr->Validate($set_attributes[$attr->title]);
+          if ($validate[0]) {
+            $bug->SetAttribute($attr->title, $validate[1]);
+          }
         }
-
-        // Handle tags.
-        if (is_array($this->input->tags_new)) {
-            foreach ($this->input->tags_new as $tag) {
-                $bug->SetAttribute('', $tag);
-            }
-        }
-        if (is_array($this->input->tags_deleted)) {
-            foreach ($this->input->tags_deleted as $tag) {
-                $bug->RemoveAttribute($tag, TRUE);
-            }
-        }
-
-        // Create a map of all the set attributes.
-        $set_attributes = array();
-        if (is_array($this->input->attributes)) {
-            foreach ($this->input->attributes as $attr) {
-                // If this is an empty attribute, ignore it.
-                if (empty($attr['title']) || empty($attr['value'])) {
-                    continue;
-                }
-                $set_attributes[$attr['title']] = $attr['value'];
-            }
-
-            // Get all potential attributes; this includes defined tags.
-            $attributes = Attribute::FetchGroup();
-            foreach ($attributes as $attr) {
-                // If the user is allowed to write to this attribute, update the
-                // value.
-                if ($attr->is_attribute() && $attr->CheckAccess($user, $bug) & Attribute::ACCESS_WRITE) {
-                    // If there is no value for this attribute, then it was removed.
-                    if (!isset($set_attributes[$attr->title])) {
-                        $bug->RemoveAttribute($attr->title, $attr->is_tag());
-                    }
-
-                    // Otherwise, update the value.
-                    $validate = $attr->Validate($set_attributes[$attr->title]);
-                    if ($validate[0]) {
-                        $bug->SetAttribute($attr->title, $validate[1]);
-                    }
-                }
-            }
-        }
-
-        Bugdar::$db->Commit();
-
-        $search = new SearchEngine();
-        $search->IndexBug($bug);
-
-        EventPump::Pump()->PostEvent(new StandardSuccessEvent('view_bug/' . $bug->bug_id, l10n::S('USER_REGISTER_SUCCESS')));
+      }
     }
+
+    Bugdar::$db->Commit();
+
+    $search = new SearchEngine();
+    $search->IndexBug($bug);
+
+    EventPump::Pump()->PostEvent(new StandardSuccessEvent('view_bug/' . $bug->bug_id, l10n::S('USER_REGISTER_SUCCESS')));
+  }
 }

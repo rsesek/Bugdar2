@@ -24,54 +24,54 @@ require_once BUGDAR_ROOT . '/includes/model_usergroup.php';
 // This views information of a bug.
 class BugViewEvent extends phalanx\events\Event
 {
-    // The bug object.
-    protected $bug = NULL;
-    public function bug() { return $this->bug; }
+  // The bug object.
+  protected $bug = NULL;
+  public function bug() { return $this->bug; }
 
-    // The user who submitted the bug object.
-    protected $bug_reporter = NULL;
-    public function bug_reporter() { return $this->bug_reporter; }
+  // The user who submitted the bug object.
+  protected $bug_reporter = NULL;
+  public function bug_reporter() { return $this->bug_reporter; }
 
-    // The attributes the bug has.
-    protected $attributes = array();
-    public function attributes() { return $this->attributes; }
+  // The attributes the bug has.
+  protected $attributes = array();
+  public function attributes() { return $this->attributes; }
 
-    // Array of comments. Oldest to newest.
-    protected $comments = array();
-    public function comments() { return $this->comments; }
+  // Array of comments. Oldest to newest.
+  protected $comments = array();
+  public function comments() { return $this->comments; }
 
-    static public function InputList()
-    {
-        return array('_id');
+  static public function InputList()
+  {
+    return array('_id');
+  }
+
+  static public function OutputList()
+  {
+    return array(
+      'bug',
+      'comments',
+      'bug_reporter',
+      'attributes'
+    );
+  }
+
+  public function WillFire()
+  {
+    $user = Bugdar::$auth->current_user();
+    if (($user && !$user->CheckGroupPermission(Usergroup::CAN_VIEW)) ||
+        (!$user && !Usergroup::AnonymousGroup()->mask & Usergroup::CAN_VIEW)) {
+      EventPump::Pump()->RaiseEvent(new StandardErrorEvent('NO_PERMISSION_CAN_VIEW'));
+      return;
     }
+  }
 
-    static public function OutputList()
-    {
-        return array(
-            'bug',
-            'comments',
-            'bug_reporter',
-            'attributes'
-        );
-    }
-
-    public function WillFire()
-    {
-        $user = Bugdar::$auth->current_user();
-        if (($user && !$user->CheckGroupPermission(Usergroup::CAN_VIEW)) ||
-            (!$user && !Usergroup::AnonymousGroup()->mask & Usergroup::CAN_VIEW)) {
-            EventPump::Pump()->RaiseEvent(new StandardErrorEvent('NO_PERMISSION_CAN_VIEW'));
-            return;
-        }
-    }
-
-    public function Fire()
-    {
-        $bug = new Bug($this->input->_id);
-        $bug->FetchInto();
-        $this->bug          = $bug;
-        $this->bug_reporter = $bug->FetchReporter();
-        $this->attributes   = $bug->FetchAttributes();
-        $this->comments     = $bug->FetchComments();
-    }
+  public function Fire()
+  {
+    $bug = new Bug($this->input->_id);
+    $bug->FetchInto();
+    $this->bug          = $bug;
+    $this->bug_reporter = $bug->FetchReporter();
+    $this->attributes   = $bug->FetchAttributes();
+    $this->comments     = $bug->FetchComments();
+  }
 }

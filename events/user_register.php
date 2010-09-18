@@ -22,62 +22,62 @@ require_once BUGDAR_ROOT . '/includes/model_user.php';
 // returning the new user's ID.
 class UserRegisterEvent extends phalanx\events\Event
 {
-    protected $user_id = 0;
-    public function user_id() { return $this->user_id; }
+  protected $user_id = 0;
+  public function user_id() { return $this->user_id; }
 
-    static public function InputList()
-    {
-        return array(
-            'do',
-            'email',
-            'alias',
-            'password'
-        );
+  static public function InputList()
+  {
+    return array(
+      'do',
+      'email',
+      'alias',
+      'password'
+    );
+  }
+
+  static public function OutputList()
+  {
+    return array('user_id');
+  }
+
+  public function WillFire()
+  {
+    if (Bugdar::$auth->IsLoggedIn())
+      $this->Cancel();
+  }
+
+  public function Fire()
+  {
+    if ($this->input->do == 'submit') {
+      if (!filter_var($this->input->email, FILTER_VALIDATE_EMAIL)) {
+        EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('INVALID_EMAIL')));
+        return;
+      }
+
+      if (strlen($this->input->password) <= 4) {
+        EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('PASSWORD_TOO_SHORT')));
+        return;
+      }
+
+      $stmt = Bugdar::$db->Prepare("SELECT COUNT(*) AS count FROM users WHERE email = ?");
+      $stmt->Execute(array($this->input->email));
+      if ($stmt->FetchObject()->count > 0) {
+        EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('EMAIL_IN_USE')));
+        return;
+      }
+
+      $alias = preg_replace('/[^a-zA-Z0-9\-_,\. ]/', '', $this->input->alias);
+      $salt  = phalanx\base\Random(10);
+
+      $user = new User();
+      $user->email        = $this->input->email;
+      $user->alias        = preg_replace('/[^a-zA-Z0-9\-_,\. ]/', '', $this->input->alias);
+      $user->password     = sha1($this->input->password);
+      $user->usergroup_id = Usergroup::ROLE_REGISTERED;
+      $user->Insert();
+      $this->user_id = $user->user_id;
+
+      EventPump::Pump()->PostEvent(new StandardSuccessEvent('login', l10n::S('USER_REGISTER_SUCCESS')));
     }
-
-    static public function OutputList()
-    {
-        return array('user_id');
-    }
-
-    public function WillFire()
-    {
-        if (Bugdar::$auth->IsLoggedIn())
-            $this->Cancel();
-    }
-
-    public function Fire()
-    {
-        if ($this->input->do == 'submit') {
-            if (!filter_var($this->input->email, FILTER_VALIDATE_EMAIL)) {
-                EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('INVALID_EMAIL')));
-                return;
-            }
-
-            if (strlen($this->input->password) <= 4) {
-                EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('PASSWORD_TOO_SHORT')));
-                return;
-            }
-
-            $stmt = Bugdar::$db->Prepare("SELECT COUNT(*) AS count FROM users WHERE email = ?");
-            $stmt->Execute(array($this->input->email));
-            if ($stmt->FetchObject()->count > 0) {
-                EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('EMAIL_IN_USE')));
-                return;
-            }
-
-            $alias = preg_replace('/[^a-zA-Z0-9\-_,\. ]/', '', $this->input->alias);
-            $salt  = phalanx\base\Random(10);
-
-            $user = new User();
-            $user->email        = $this->input->email;
-            $user->alias        = preg_replace('/[^a-zA-Z0-9\-_,\. ]/', '', $this->input->alias);
-            $user->password     = sha1($this->input->password);
-            $user->usergroup_id = Usergroup::ROLE_REGISTERED;
-            $user->Insert();
-            $this->user_id = $user->user_id;
-
-            EventPump::Pump()->PostEvent(new StandardSuccessEvent('login', l10n::S('USER_REGISTER_SUCCESS')));
-        }
-    }
+  }
 }

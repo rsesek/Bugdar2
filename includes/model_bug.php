@@ -18,144 +18,144 @@ require_once PHALANX_ROOT . '/data/model.php';
 
 class Bug extends phalanx\data\Model
 {
-    // Model properties.
-    protected $table_prefix = TABLE_PREFIX;
-    protected $table = 'bugs';
-    protected $primary_key = 'bug_id';
-    protected $condition = 'bug_id = :bug_id';
+  // Model properties.
+  protected $table_prefix = TABLE_PREFIX;
+  protected $table = 'bugs';
+  protected $primary_key = 'bug_id';
+  protected $condition = 'bug_id = :bug_id';
 
-    // Struct properties.
-    protected $fields = array(
-        'bug_id',
-        'title',
-        'reporting_user_id',
-        'reporting_date',
-        'hidden',
-        'first_comment_id'
-    );
+  // Struct properties.
+  protected $fields = array(
+    'bug_id',
+    'title',
+    'reporting_user_id',
+    'reporting_date',
+    'hidden',
+    'first_comment_id'
+  );
 
-    // Cached attributes.
-    protected $attributes = array();
+  // Cached attributes.
+  protected $attributes = array();
 
-    // Override FetchInto() to clear the attribute cache.
-    public function FetchInto()
-    {
-        $this->attributes = array();
-        return parent::FetchInto();
+  // Override FetchInto() to clear the attribute cache.
+  public function FetchInto()
+  {
+    $this->attributes = array();
+    return parent::FetchInto();
+  }
+
+  // Fetches all the comments for a bug and returns them in a time descending
+  // order, oldest to newest.
+  public function FetchComments()
+  {
+    $comments = array();
+    $stmt   = Bugdar::$db->Prepare("
+      SELECT comments.*, users.alias as post_alias
+      FROM " . TABLE_PREFIX . "comments comments
+      LEFT JOIN " . TABLE_PREFIX . "users users
+        ON (comments.post_user_id = users.user_id)
+      WHERE comments.bug_id = ?
+      ORDER BY comments.post_date
+    ");
+    $stmt->Execute(array($this->bug_id));
+    while ($comment = $stmt->FetchObject())
+      $comments[] = $comment;
+    return $comments;
+  }
+
+  // Returns an array of all the attributes the bug has.
+  public function FetchAttributes()
+  {
+    if ($this->attributes)
+      return $this->attributes;
+
+    $this->attributes = array();
+    $stmt = Bugdar::$db->Prepare("SELECT * from " . TABLE_PREFIX . "bug_attributes WHERE bug_id = ?");
+    $stmt->Execute(array($this->bug_id));
+    while ($attr = $stmt->FetchObject()) {
+      $this->attributes[] = $attr;
     }
+    return $this->attributes;
+  }
 
-    // Fetches all the comments for a bug and returns them in a time descending
-    // order, oldest to newest.
-    public function FetchComments()
-    {
-        $comments = array();
-        $stmt     = Bugdar::$db->Prepare("
-            SELECT comments.*, users.alias as post_alias
-            FROM " . TABLE_PREFIX . "comments comments
-            LEFT JOIN " . TABLE_PREFIX . "users users
-                ON (comments.post_user_id = users.user_id)
-            WHERE comments.bug_id = ?
-            ORDER BY comments.post_date
+  // Returns the user who reported the bug.
+  public function FetchReporter()
+  {
+    $user = new User($this->reporting_user_id);
+    $user->FetchInto();
+    return $user;
+  }
+
+  // Sets an attribute. If |key| is NULL, this will act as a tag. Note that
+  // this does not perform validation or permission checks.
+  public function SetAttribute($key, $value)
+  {
+    $this->FetchAttributes();
+    $stmt   = NULL;
+    $is_new = FALSE;
+
+    // Updating a tag isn't possible; a user either adds and removes one.
+    // Attributes, however, can be updated.
+    foreach ($this->attributes as $i => $attr) {
+      if ($key && $attr->attribute_title == $key) {
+        $stmt = Bugdar::$db->Prepare("
+          UPDATE " . TABLE_PREFIX . "bug_attributes
+          SET value = :value
+          WHERE bug_id = :bug_id
+          AND attribute_title = :attribute_title
         ");
-        $stmt->Execute(array($this->bug_id));
-        while ($comment = $stmt->FetchObject())
-            $comments[] = $comment;
-        return $comments;
+        $this->attributes[$i]->value = $value;
+        break;
+      }
     }
-
-    // Returns an array of all the attributes the bug has.
-    public function FetchAttributes()
-    {
-        if ($this->attributes)
-            return $this->attributes;
-
-        $this->attributes = array();
-        $stmt = Bugdar::$db->Prepare("SELECT * from " . TABLE_PREFIX . "bug_attributes WHERE bug_id = ?");
-        $stmt->Execute(array($this->bug_id));
-        while ($attr = $stmt->FetchObject()) {
-            $this->attributes[] = $attr;
-        }
-        return $this->attributes;
+    // An update wasn't performed, so insert a new record.
+    if (!$stmt) {
+      $is_new = TRUE;
+      $stmt = Bugdar::$db->Prepare("
+        INSERT INTO " . TABLE_PREFIX . "bug_attributes
+          (bug_id, attribute_title, value)
+        VALUES
+          (:bug_id, :attribute_title, :value)
+      ");
     }
-
-    // Returns the user who reported the bug.
-    public function FetchReporter()
-    {
-        $user = new User($this->reporting_user_id);
-        $user->FetchInto();
-        return $user;
+    $data = array(
+      'bug_id'          => $this->bug_id,
+      'attribute_title' => $key,
+      'value'           => $value
+    );
+    $stmt->Execute($data);
+    // If this is a new record, add it to the attribute cache.
+    if ($is_new) {
+      $this->attributes[] = new \phalanx\base\PropertyBag($data);
     }
+  }
 
-    // Sets an attribute. If |key| is NULL, this will act as a tag. Note that
-    // this does not perform validation or permission checks.
-    public function SetAttribute($key, $value)
-    {
-        $this->FetchAttributes();
-        $stmt   = NULL;
-        $is_new = FALSE;
-
-        // Updating a tag isn't possible; a user either adds and removes one.
-        // Attributes, however, can be updated.
-        foreach ($this->attributes as $i => $attr) {
-            if ($key && $attr->attribute_title == $key) {
-                $stmt = Bugdar::$db->Prepare("
-                    UPDATE " . TABLE_PREFIX . "bug_attributes
-                    SET value = :value
-                    WHERE bug_id = :bug_id
-                    AND attribute_title = :attribute_title
-                ");
-                $this->attributes[$i]->value = $value;
-                break;
-            }
-        }
-        // An update wasn't performed, so insert a new record.
-        if (!$stmt) {
-            $is_new = TRUE;
-            $stmt = Bugdar::$db->Prepare("
-                INSERT INTO " . TABLE_PREFIX . "bug_attributes
-                    (bug_id, attribute_title, value)
-                VALUES
-                    (:bug_id, :attribute_title, :value)
-            ");
-        }
-        $data = array(
-            'bug_id'          => $this->bug_id,
-            'attribute_title' => $key,
-            'value'           => $value
-        );
-        $stmt->Execute($data);
-        // If this is a new record, add it to the attribute cache.
-        if ($is_new) {
-            $this->attributes[] = new \phalanx\base\PropertyBag($data);
-        }
+  // Removes an attribute or tag.
+  public function RemoveAttribute($key, $is_tag = FALSE)
+  {
+    if ($is_tag) {
+      $stmt = Bugdar::$db->Prepare("
+        DELETE FROM " . TABLE_PREFIX . "bug_attributes
+        WHERE bug_id = ?
+        AND value = ?
+        AND attribute_title = ''
+      ");
+      $stmt->Execute(array($this->bug_id, $key));
+    } else {
+      $stmt = Bugdar::$db->Prepare("
+        DELETE FROM " . TABLE_PREFIX . "bug_attributes
+        WHERE bug_id = ?
+        AND attribute_title = ?
+      ");
+      $stmt->Execute(array($this->bug_id, $key));
     }
-
-    // Removes an attribute or tag.
-    public function RemoveAttribute($key, $is_tag = FALSE)
-    {
-        if ($is_tag) {
-            $stmt = Bugdar::$db->Prepare("
-                DELETE FROM " . TABLE_PREFIX . "bug_attributes
-                WHERE bug_id = ?
-                AND value = ?
-                AND attribute_title = ''
-            ");
-            $stmt->Execute(array($this->bug_id, $key));
-        } else {
-            $stmt = Bugdar::$db->Prepare("
-                DELETE FROM " . TABLE_PREFIX . "bug_attributes
-                WHERE bug_id = ?
-                AND attribute_title = ?
-            ");
-            $stmt->Execute(array($this->bug_id, $key));
-        }
-        // Remove the attribute from the cache.
-        foreach ($this->attributes as $i => $attr) {
-            if ((!$is_tag && $attr->attribute_title == $key) ||
-                ($is_tag && $attr->value == $key)) {
-                unset($this->attributes[$i]);
-                break;
-            }
-        }
+    // Remove the attribute from the cache.
+    foreach ($this->attributes as $i => $attr) {
+      if ((!$is_tag && $attr->attribute_title == $key) ||
+        ($is_tag && $attr->value == $key)) {
+        unset($this->attributes[$i]);
+        break;
+      }
     }
+  }
 }
