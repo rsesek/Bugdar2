@@ -23,7 +23,7 @@ title - Used as the title of the web page.
 
   <ul id="navigation">
     <li><a href="<?= EventLink('BugList') ?>">List</a></li>
-    <li>Report</li>
+    <li><a href="<?= EventLink('BugNew') ?>">Report</a></li>
     <li><a href="<?= EventLink('AdminSettings') ?>">Options</a></li>
   </ul>
 </div>

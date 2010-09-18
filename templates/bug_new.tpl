@@ -1,3 +1,5 @@
+<?= InsertView('header', array('title' => l10n::S('BUG_NEW_TITLE'))) ?>
+
 <h1>New Bug</h1>
 
 <form action="<?= EventLink('BugNew') ?>" method="post">
@@ -13,3 +15,5 @@
 
 <p><input type="submit" value="Continue &rarr;"></p>
 </form>
+
+<? InsertView('footer') ?>

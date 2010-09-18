@@ -38,6 +38,12 @@ class Language_en_US extends \bugdar\Language
     static $strings = array(
       'BUG_LIST_TITLE' => 'List',
 
+      'BUG_NEW_TITLE' => 'New Report',
+
+      'USER_LOGIN_TITLE' => 'Login',
+      'USER_LOGIN_EMAIL' => 'Email',
+      'USER_LOGIN_PASSWORD' => 'Password',
+
       'ADMIN_SETTINGS_TITLE' => 'System Options',
       'ADMIN_SETTINGS_WEBROOT_VAR' => 'Web Root',
       'ADMIN_SETTINGS_WEBROOT_DFN' => 'The absolute path from the server root to the Bugdar installation.  This should end with a trailing slash.',
