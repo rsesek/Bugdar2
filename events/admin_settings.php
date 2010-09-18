@@ -43,6 +43,9 @@ class AdminSettingsEvent extends phalanx\events\Event
     $valid_settings = array(
       // The absolute path to the Bugdar installation.  Used to construct links.
       'webroot',
+
+      // The name of the bug tracker.
+      'tracker_name',
     );
 
     // Load the current settings.
@@ -70,6 +73,7 @@ class AdminSettingsEvent extends phalanx\events\Event
         ));
         $this->settings[$setting] = $value;
       }
+      Bugdar::$settings = $this->settings;
       Bugdar::$db->Commit();
     }
   }

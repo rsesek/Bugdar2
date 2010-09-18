@@ -45,6 +45,8 @@ class Language_en_US extends \bugdar\Language
       'USER_LOGIN_PASSWORD' => 'Password',
 
       'ADMIN_SETTINGS_TITLE' => 'System Options',
+      'ADMIN_SETTINGS_TRACKER_NAME_VAR' => 'Tracker Name',
+      'ADMIN_SETTINGS_TRACKER_NAME_DFN' => 'The name of this bug tracker, which will appear in page titles and email subjects.',
       'ADMIN_SETTINGS_WEBROOT_VAR' => 'Web Root',
       'ADMIN_SETTINGS_WEBROOT_DFN' => 'The absolute path from the server root to the Bugdar installation.  This should end with a trailing slash.',
       'ADMIN_SETTINGS_SAVE' => 'Save Settings',
