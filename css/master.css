@@ -1,3 +1,4 @@
+/** Basic elements */
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 12pt;
@@ -6,6 +7,31 @@ body {
 #header {
   background-color: lightgray;
   margin-bottom: 10px;
+  padding: 3px;
+}
+
+#header h1 {
+  font-size: 18pt;
+  display: inline;
+  margin-right: 20px;
+}
+
+#navigation {
+  display: inline-block;
+  list-style: none;
+}
+
+#navigation li {
+  display: inline-block;
+  margin: 0px 20px 0px 20px;
+}
+
+#userinfo {
+  float: right;
+}
+
+#wrapper {
+  padding: 7px;
 }
 
 #footer {
@@ -14,10 +40,7 @@ body {
   margin-top: 20px;
 }
 
-#userinfo {
-  float: right;
-}
-
+/** Main bug list */
 #bug-list {
   width: 100%;
 
@@ -43,10 +66,12 @@ body {
   background-color: rgb(242, 242, 242);
 }
 
+/** Bug display */
 #attributes dt {
   float: left;
 }
 
+/** System Options */
 #settings {
   width: 75%;
   margin: auto;

@@ -11,6 +11,8 @@ title - Used as the title of the web page.
   <link rel="stylesheet" href="<?= WebRoot('css/master.css') ?>" type="text/css" media="screen" />
 </head>
 
+<body>
+
 <div id="header">
   <div id="userinfo">
     <? if (Bugdar::$auth->IsLoggedIn()): ?>
@@ -21,6 +23,7 @@ title - Used as the title of the web page.
     <? endif ?>
   </div>
 
+  <h1><?= Cleaner::HTML(Bugdar::$settings['tracker_name']) ?></h1>
   <ul id="navigation">
     <li><a href="<?= EventLink('BugList') ?>">List</a></li>
     <li><a href="<?= EventLink('BugNew') ?>">Report</a></li>
@@ -28,4 +31,5 @@ title - Used as the title of the web page.
   </ul>
 </div>
 
-<body>
+<!-- wrapper -->
+<div id="wrapper">
