@@ -6,7 +6,7 @@ title - Used as the title of the web page.
 <!DOCTYPE html>
 <html lang="<?= l10n::Instance()->GetLanguage()->code() ?>">
 <head>
-  <title>$[title] - Bugdar 2.0b1</title>
+  <title>$[title] - Bugdar2</title>
   <link rel="stylesheet" href="<?= WebRoot('css/reset.css') ?>" type="text/css" media="screen" />
   <link rel="stylesheet" href="<?= WebRoot('css/master.css') ?>" type="text/css" media="screen" />
 </head>

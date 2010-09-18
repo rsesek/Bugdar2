@@ -8,6 +8,12 @@ body {
   margin-bottom: 10px;
 }
 
+#footer {
+  font-size: 9pt;
+  text-align: center;
+  margin-top: 20px;
+}
+
 #userinfo {
   float: right;
 }
