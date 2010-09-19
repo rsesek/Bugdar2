@@ -39,6 +39,7 @@ class Language_en_US extends \bugdar\Language
       'BUG_LIST_TITLE' => 'List',
 
       'BUG_NEW_TITLE' => 'New Report',
+      'BUG_EDIT_TITLE' => 'Bug #%d: %s',
 
       'USER_LOGIN_TITLE' => 'Login',
       'USER_LOGIN_EMAIL' => 'Email',

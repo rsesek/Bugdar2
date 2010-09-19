@@ -32,6 +32,12 @@ class l10n
     return self::Instance()->GetString($string);
   }
 
+  static public function F()
+  {
+    $args = func_get_args();
+    return call_user_func_array(array(self::Instance(), 'GetFormattedString'), $args);
+  }
+
   protected function __construct()
   {
     $this->language = new Language_en_US();
@@ -47,6 +53,13 @@ class l10n
       return $string;
     }
     return $strings[$string];
+  }
+
+  public function GetFormattedString()
+  {
+    $args = func_get_args();
+    $args[0] = $this->GetString($args[0]);
+    return call_user_func_array('sprintf', $args);
   }
 
   public function GetLanguage()

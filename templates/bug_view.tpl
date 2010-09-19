@@ -1,5 +1,7 @@
 <?
-  $title = ($this->action == 'insert' ? 'New Bug' : 'Bug #' . $this->bug->bug_id);
+  $title = ($this->action == 'insert') ?
+      l10n::S('BUG_NEW_TITLE') :
+      l10n::F('BUG_EDIT_TITLE', $this->bug->bug_id, Cleaner::HTML($this->bug->title));
   InsertView('header', array('title' => $title))
 ?>
 
