@@ -54,11 +54,13 @@ class Attribute extends phalanx\data\Model
 
   public function is_tag()
   {
-    return empty($this->title);
+    $title = $this->title;
+    return empty($title);
   }
   public function is_attribute()
   {
-    return !empty($this->title);
+    $title = $this->title;
+    return !empty($title);
   }
 
   // Returns the access level that |user| has for this attribute for |bug|.
