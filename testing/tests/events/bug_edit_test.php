@@ -47,11 +47,14 @@ class BugEditEventTest extends BugdarTestCase
         $bug = $this->_MakeBug();
 
         $data = new \phalanx\base\PropertyBag(array(
+            '_method'   => 'POST',
+            'action'    => 'update',
             'bug_id'    => $bug->bug_id,
             'tags_new'  => array('red', 'green', 'blue')
         ));
         $event = new BugEditEvent($data);
         EventPump::Pump()->PostEvent($event);
+        $this->assertEquals(EventPump::EVENT_FINISHED, $event->state());
 
         $attrs = $bug->FetchAttributes();
         $this->assertEquals(3, count($attrs));
@@ -68,11 +71,14 @@ class BugEditEventTest extends BugdarTestCase
         $bug = $this->testAddTags();
 
         $data = new \phalanx\base\PropertyBag(array(
+            '_method'      => 'POST',
+            'action'       => 'update',
             'bug_id'       => $bug->bug_id,
             'tags_deleted' => array('red', 'blue')
         ));
         $event = new BugEditEvent($data);
         EventPump::Pump()->PostEvent($event);
+        $this->assertEquals(EventPump::EVENT_FINISHED, $event->state());
 
         // Re-query the bug because the attribute cache is stale due to the
         // attributes being modified by another instance of the Model object.
@@ -87,15 +93,61 @@ class BugEditEventTest extends BugdarTestCase
         $bug = $this->_MakeBug();
 
         $data = new \phalanx\base\PropertyBag(array(
+            '_method'       => 'POST',
+            'action'        => 'update',
             'bug_id'        => $bug->bug_id,
             'comment_body'  => 'Second comment.'
         ));
         $event = new BugEditEvent($data);
         EventPump::Pump()->PostEvent($event);
+        $this->assertEquals(EventPump::EVENT_FINISHED, $event->state());
 
         $comments = $bug->FetchComments();
         $this->assertEquals(2, count($comments));
         $this->assertEquals('Testing 1 2 3', $comments[0]->body);
         $this->assertEquals($data->comment_body, $comments[1]->body);
+    }
+
+    public function testNewBug()
+    {
+        $data = new phalanx\base\PropertyBag(array(
+            '_method'      => 'POST',
+            'action'       => 'insert',
+            'title'        => 'New Bug',
+            'comment_body' => 'This is a Test Bug'
+        ));
+        $event = new BugEditEvent($data);
+        $time  = time();
+        EventPump::Pump()->PostEvent($event);
+        $this->assertEquals(EventPump::EVENT_FINISHED, $event->state());
+
+        $bug = new Bug($event->bug_id());
+        $bug->FetchInto();
+        $this->assertEquals($data->title, $bug->title);
+        $this->assertEquals(Bugdar::$auth->current_user()->user_id, $bug->reporting_user_id);
+        $this->assertEquals(0, $bug->hidden);
+        $this->assertGreaterThanOrEqual($time, $bug->reporting_date);
+
+        $comment = new Comment($event->comment_id());
+        $comment->FetchInto();
+        $this->assertEquals($bug->bug_id, $comment->bug_id);
+        $this->assertEquals($bug->first_comment_id, $comment->comment_id);
+        $this->assertEquals(Bugdar::$auth->current_user()->user_id, $comment->post_user_id);
+        $this->assertGreaterThanOrEqual($time, $comment->post_date);
+        $this->assertEquals($data->comment_body, $comment->body);
+    }
+
+    public function testNewBugMissingTitle()
+    {
+        $data = new phalanx\base\PropertyBag(array(
+            '_method'      => 'POST',
+            'action'       => 'insert',
+            'comment_body' => 'This is a Test Bug'
+        ));
+        $event = new BugEditEvent($data);
+        $time  = time();
+        EventPump::Pump()->PostEvent($event);
+        $this->assertEquals(EventPump::EVENT_FIRE, $event->state());
+        $this->assertType('StandardErrorEvent', EventPump::Pump()->GetEventChain()->Top());
     }
 }

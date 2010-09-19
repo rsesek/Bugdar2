@@ -40,6 +40,9 @@ class BugViewEvent extends phalanx\events\Event
   protected $comments = array();
   public function comments() { return $this->comments; }
 
+  // What action to perform in the BugEditEvent.
+  public function action() { return 'update'; }
+
   static public function InputList()
   {
     return array('_id');
@@ -48,6 +51,7 @@ class BugViewEvent extends phalanx\events\Event
   static public function OutputList()
   {
     return array(
+      'action',
       'bug',
       'comments',
       'bug_reporter',

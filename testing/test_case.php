@@ -45,6 +45,7 @@ abstract class BugdarTestCase extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
+        phalanx\events\EventPump::set_pump(new \phalanx\events\EventPump());
         phalanx\events\EventPump::Pump()->set_output_handler(
             new phalanx\events\UnitTestOutputHandler());
         Bugdar::$auth = NULL;

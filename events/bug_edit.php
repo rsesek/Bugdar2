@@ -24,10 +24,21 @@ require_once BUGDAR_ROOT . '/includes/search_engine.php';
 // This event creates a new comment on a bug.
 class BugEditEvent extends phalanx\events\Event
 {
+  protected $bug_id = 0;
+  public function bug_id() { return $this->bug_id; }
+
+  protected $comment_id = 0;
+  public function comment_id() { return $this->comment_id; }
+
+  protected $action = '__unset_operation__';
+  public function action() { return $this->action; }
+
   static public function InputList()
   {
     return array(
+      'action',
       'bug_id',
+      'title',
       'comment_body',
       'attributes',
       'tags_new',
@@ -37,7 +48,11 @@ class BugEditEvent extends phalanx\events\Event
 
   static public function OutputList()
   {
-    return array();
+    return array(
+      'action',
+      'bug_id',
+      'comment_id'
+    );
   }
 
   public function WillFire()
@@ -47,77 +62,131 @@ class BugEditEvent extends phalanx\events\Event
 
   public function Fire()
   {
-    $bug  = new Bug($this->input->bug_id);
+    $do_insert = ($this->input->action == 'insert');
+    $do_update = ($this->input->action == 'update');
+    if ($this->input->_method != 'POST') {
+      EventPump::Pump()->RaiseEvent(new StandardErrorEvent('Request must be POSTed'));
+      return;
+    }
+
+    // Create an empty Model object if creating a new bug, or fetch the data of
+    // an existing bug to update.
+    if ($do_insert) {
+      $bug = new Bug();
+    } else if ($do_update) {
+      $bug  = new Bug($this->input->bug_id);
+      try {
+        $bug->FetchInto();
+      } catch (\phalanx\data\ModelException $e) {
+        EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_ID_NOT_FOUND')));
+        return;
+      }
+    } else {
+      EventPump::Pump()->RaiseEvent(new StandardErrorEvent('Invalid bug operation'));
+      return;
+    }
+    $this->action = $this->input->action;
+
     $user = Bugdar::$auth->current_user();
 
-    try {
-      $bug->FetchInto();
-    } catch (\phalanx\data\ModelException $e) {
-      EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_ID_NOT_FOUND')));
+    $title = trim($this->input->title);
+    if (empty($title) && $do_insert) {
+      EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_MISSING_TITLE')));
       return;
     }
 
     Bugdar::$db->BeginTransaction();
-
-    // Add a comment if one is present.
-    $body = trim($this->input->comment_body);
-    if (!empty($body)) {
-      $comment = new Comment();
-      $comment->bug_id     = $bug->bug_id;
-      $comment->post_user_id = $user->user_id;
-      $comment->post_date  = time();
-      $comment->body     = $body;
-      $comment->Insert();
-    }
-
-    // Handle tags.
-    if (is_array($this->input->tags_new)) {
-      foreach ($this->input->tags_new as $tag) {
-        $bug->SetAttribute('', $tag);
+    {
+      $now = time();
+      if (!empty($title)) {
+        $bug->title = $title;
       }
-    }
-    if (is_array($this->input->tags_deleted)) {
-      foreach ($this->input->tags_deleted as $tag) {
-        $bug->RemoveAttribute($tag, TRUE);
-      }
-    }
 
-    // Create a map of all the set attributes.
-    $set_attributes = array();
-    if (is_array($this->input->attributes)) {
-      foreach ($this->input->attributes as $attr) {
-        // If this is an empty attribute, ignore it.
-        if (empty($attr['title']) || empty($attr['value'])) {
-          continue;
+      if ($do_insert) {
+        $bug->reporting_user_id = $user->user_id;
+        $bug->reporting_date    = $now;
+        $bug->Insert();
+      } else if ($do_update) {
+        $bug->Update();
+      }
+
+      // Now set the bug_id output value, which will be set after a call to
+      // Insert().  Updated bugs will have this set from FetchInto().
+      $this->bug_id = $bug->bug_id;
+
+      // Add a comment if one is present.
+      $body = trim($this->input->comment_body);
+      if (!empty($body) || $do_insert) {
+        if ($do_insert && empty($body)) {
+          EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('COMMENT_MISSING_BODY')));
+          return;
         }
-        $set_attributes[$attr['title']] = $attr['value'];
-      }
+        $comment = new Comment();
+        $comment->bug_id       = $this->bug_id;
+        $comment->post_user_id = $user->user_id;
+        $comment->post_date    = $now;
+        $comment->body         = $body;
+        $comment->Insert();
+        $this->comment_id = $comment->comment_id;
 
-      // Get all potential attributes; this includes defined tags.
-      $attributes = Attribute::FetchGroup();
-      foreach ($attributes as $attr) {
-        // If the user is allowed to write to this attribute, update the
-        // value.
-        if ($attr->is_attribute() && $attr->CheckAccess($user, $bug) & Attribute::ACCESS_WRITE) {
-          // If there is no value for this attribute, then it was removed.
-          if (!isset($set_attributes[$attr->title])) {
-            $bug->RemoveAttribute($attr->title, $attr->is_tag());
-          }
-
-          // Otherwise, update the value.
-          $validate = $attr->Validate($set_attributes[$attr->title]);
-          if ($validate[0]) {
-            $bug->SetAttribute($attr->title, $validate[1]);
-          }
+        // Update the bug so it can find that first comment easiliy.
+        if ($do_insert) {
+          $bug = new Bug($bug->bug_id);
+          $bug->first_comment_id = $comment->comment_id;
+          $bug->Update();
+          $bug->FetchInto();
         }
       }
-    }
 
+      // Handle tags.
+      if (is_array($this->input->tags_new)) {
+        foreach ($this->input->tags_new as $tag) {
+          $bug->SetAttribute('', $tag);
+        }
+      }
+      if (is_array($this->input->tags_deleted)) {
+        foreach ($this->input->tags_deleted as $tag) {
+          $bug->RemoveAttribute($tag, TRUE);
+        }
+      }
+
+      // Create a map of all the set attributes.
+      $set_attributes = array();
+      if (is_array($this->input->attributes)) {
+        foreach ($this->input->attributes as $attr) {
+          // If this is an empty attribute, ignore it.
+          if (empty($attr['title']) || empty($attr['value'])) {
+            continue;
+          }
+          $set_attributes[$attr['title']] = $attr['value'];
+        }
+
+        // Get all potential attributes; this includes defined tags.
+        $attributes = Attribute::FetchGroup();
+        foreach ($attributes as $attr) {
+          // If the user is allowed to write to this attribute, update the
+          // value.
+          if ($attr->is_attribute() && $attr->CheckAccess($user, $bug) & Attribute::ACCESS_WRITE) {
+            // If there is no value for this attribute, then it was removed.
+            if (!isset($set_attributes[$attr->title])) {
+              $bug->RemoveAttribute($attr->title, $attr->is_tag());
+            }
+
+            // Otherwise, update the value.
+            $validate = $attr->Validate($set_attributes[$attr->title]);
+            if ($validate[0]) {
+              $bug->SetAttribute($attr->title, $validate[1]);
+            }
+          }
+        }
+      }
+    }
     Bugdar::$db->Commit();
 
     $search = new SearchEngine();
     $search->IndexBug($bug);
 
-    EventPump::Pump()->PostEvent(new StandardSuccessEvent('view_bug/' . $bug->bug_id, l10n::S('USER_REGISTER_SUCCESS')));
+    $string = ($do_insert) ? l10n::S('BUG_CREATED_SUCCESSFULLY') : l10n::S('BUG_EDIT_SUCCESS');
+    EventPump::Pump()->PostEvent(new StandardSuccessEvent('view_bug/' . $this->bug_id, $string));
   }
 }
