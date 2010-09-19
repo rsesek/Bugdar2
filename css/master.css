@@ -76,47 +76,71 @@ body, input, textarea {
     linear,
     left bottom,
     left top,
-    color-stop(0, rgb(255,255,255)),
-    color-stop(1, rgb(220,231,250))
+    color-stop(0.5, rgb(255,255,255)),
+    color-stop(1, #BBBDE3)
   );
   background: ;-moz-linear-gradient(
     center bottom,
-    rgb(255,255,255) 0%,
-    rgb(220,231,250) 100%
-  );  
+    rgb(255,255,255) 90%,
+    #BBBDE3 100%
+  );
 }
 
 #bug-title input {
-  width: 70%;
+  width: 99%;
+  margin: 3px;
 }
 
 #bug-comments {
   width: 70%;
+  padding: 3px;
+
+  display: inline-block;
+
   background-color: white;
+
+  border-color: black;
+  border-style: solid;
+  border-width: 1px 1px 0px 0px;
 }
 
 #metadata {
-  width: 30%;
-  float: right;
+  width: 29%;
+  display: inline-block;
+  vertical-align: top;
 }
 
-#attributes dt {
-  float: left;
-  width: 40%;
-  font-weight: bold;
-  clear: both;
+#attributes {
+  padding: 5px;
 }
 
 #attributes input {
   width: 90%;
+  padding: 3px;
 }
+
+#attributes dt {
+  display: inline-block;
+  width: 48%;
+  font-weight: bold;
+  clear: both;
+}
+
+  #attributes dt input {
+    background-color: #8BACD0;
+    border: 1px solid black;
+  }
 
 #attributes dd {
 /*  width: 20%;*/
-/*  display: inline-block;*/
-  float: right;
+  display: inline-block;
   width: 48%;
 }
+
+  #attributes dd input {
+    background-color: #C5D6E8;
+    border: 1px solid black;
+  }
 
 /** System Options */
 #settings {

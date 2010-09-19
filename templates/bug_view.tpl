@@ -20,25 +20,6 @@
   <input type="text" name="title" value="$[bug.title]" id="title">
 </h1>
 
-<div id="metadata">
-  <dl id="attributes">
-    <? if ($this->bug->bug_id): ?>
-      <dt>Bug ID:</dt>
-      <dd>$[bug.bug_id]</dd>
-    <? endif ?>
-    <dt>Reporter:</dt>
-    <dd>$[bug_reporter.alias]</dd>
-
-    <dt>Date:</dt>
-    <dd><?= gmdate('r', $this->bug->reporting_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></dd>
-  </dl>
-
-  <div class="clear"></div>
-
-  <div><a href="javascript:AddAttribute()">Add Attribute</a></div>
-  <div><input type="submit" name="submit" value="Save Changes" id="submit" /></div>
-</div>
-
 <div id="bug-comments">
   <? if ($this->action != 'insert'): ?>
     <? foreach ($this->comments as $comment): ?>
@@ -51,6 +32,27 @@
 
   <h1><?= ($this->action == 'update' ? 'Add Comment' : 'Description') ?></h1>
   <textarea name="comment_body" rows="8" cols="40"></textarea>
+</div>
+
+<div id="metadata">
+  <dl id="attributes">
+    <? if ($this->bug->bug_id): ?>
+      <dt>Bug ID:</dt>
+      <dd>$[bug.bug_id]</dd>
+    <? endif ?>
+    <dt>Reporter:</dt>
+    <dd>$[bug_reporter.alias]</dd>
+
+    <? if ($this->bug->reporting_date): ?>
+      <dt>Date:</dt>
+      <dd><?= gmdate('j M. Y \a\t H:i', $this->bug->reporting_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></dd>
+    <? endif ?>
+  </dl>
+
+  <div class="clear"></div>
+
+  <div><a href="javascript:AddAttribute()">Add Attribute</a></div>
+  <div><input type="submit" name="submit" value="Save Changes" id="submit" /></div>
 </div>
 
 </form>
