@@ -2,8 +2,11 @@
   $title = ($this->action == 'insert') ?
       l10n::S('BUG_NEW_TITLE') :
       l10n::F('BUG_EDIT_TITLE', $this->bug->bug_id, Cleaner::HTML($this->bug->title));
-  InsertView('header', array('title' => $title))
+  InsertView('header', array('title' => $title, 'disable_wrapper' => TRUE));
 ?>
+
+<!-- bug-content -->
+<div id="bug-content">
 
 <script type="text/javascript" src="<?= WebRoot('js/attributes.js') ?>"></script>
 
@@ -13,32 +16,42 @@
 <? endif ?>
 <input type="hidden" name="action" value="$[action]" id="action">
 
-<h1>Bug #$[bug.bug_id]: <input type="text" name="title" value="$[bug.title]" id="title"></h1>
+<h1 id="bug-title">
+  <input type="text" name="title" value="$[bug.title]" id="title">
+</h1>
 
-<dl id="attributes">
-  <dt>Reporter:</dt>
-  <dd>$[bug_reporter.alias]</dd>
+<div id="metadata">
+  <dl id="attributes">
+    <? if ($this->bug->bug_id): ?>
+      <dt>Bug ID:</dt>
+      <dd>$[bug.bug_id]</dd>
+    <? endif ?>
+    <dt>Reporter:</dt>
+    <dd>$[bug_reporter.alias]</dd>
 
-  <dt>Date:</dt>
-  <dd><?= gmdate('r', $this->bug->reporting_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></dd>
-</dl>
+    <dt>Date:</dt>
+    <dd><?= gmdate('r', $this->bug->reporting_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></dd>
+  </dl>
 
-<div><a href="javascript:AddAttribute()">Add Attribute</a></div>
+  <div class="clear"></div>
 
-<? if ($this->action != 'insert'): ?>
-  <h2>Comments</h2>
-  <? foreach ($this->comments as $comment): ?>
-  <div>
-    <strong>Posted by <a href="<?= EventLink('UserView', $comment->post_alias) ?>"><?= Cleaner::HTML($comment->post_alias) ?></a> on <?= gmdate('r', $comment->post_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></strong>
-    <p><?= Cleaner::HTML($comment->body) ?></p>
-  </div>
-  <? endforeach ?>
-<? endif ?>
+  <div><a href="javascript:AddAttribute()">Add Attribute</a></div>
+  <div><input type="submit" name="submit" value="Save Changes" id="submit" /></div>
+</div>
 
-<h1><?= ($this->action == 'update' ? 'Add Comment' : 'Description') ?></h1>
-<textarea name="comment_body" rows="8" cols="40"></textarea>
+<div id="bug-comments">
+  <? if ($this->action != 'insert'): ?>
+    <? foreach ($this->comments as $comment): ?>
+    <div>
+      <strong>Posted by <a href="<?= EventLink('UserView', $comment->post_alias) ?>"><?= Cleaner::HTML($comment->post_alias) ?></a> on <?= gmdate('r', $comment->post_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></strong>
+      <p><?= Cleaner::HTML($comment->body) ?></p>
+    </div>
+    <? endforeach ?>
+  <? endif ?>
 
-<div><input type="submit" name="submit" value="Save Changes" id="submit" /></div>
+  <h1><?= ($this->action == 'update' ? 'Add Comment' : 'Description') ?></h1>
+  <textarea name="comment_body" rows="8" cols="40"></textarea>
+</div>
 
 </form>
 
@@ -48,5 +61,8 @@
 <? endforeach ?>
   AddAttribute();
 </script>
+
+</div>
+<!-- / bug-content -->
 
 <?= InsertView('footer') ?>

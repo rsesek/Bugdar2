@@ -32,4 +32,4 @@ title - Used as the title of the web page.
 </div>
 
 <!-- wrapper -->
-<div id="wrapper">
+<div id="<?= ($this->disable_wrapper) ? 'no-wrapper' : 'wrapper' ?>">

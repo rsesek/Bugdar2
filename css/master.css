@@ -1,5 +1,5 @@
 /** Basic elements */
-body {
+body, input, textarea {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 12pt;
 }
@@ -40,6 +40,10 @@ body {
   margin-top: 20px;
 }
 
+.clear {
+  clear: both;
+}
+
 /** Main bug list */
 #bug-list {
   width: 100%;
@@ -67,8 +71,51 @@ body {
 }
 
 /** Bug display */
+#bug-content {
+  background: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0, rgb(255,255,255)),
+    color-stop(1, rgb(220,231,250))
+  );
+  background: ;-moz-linear-gradient(
+    center bottom,
+    rgb(255,255,255) 0%,
+    rgb(220,231,250) 100%
+  );  
+}
+
+#bug-title input {
+  width: 70%;
+}
+
+#bug-comments {
+  width: 70%;
+  background-color: white;
+}
+
+#metadata {
+  width: 30%;
+  float: right;
+}
+
 #attributes dt {
   float: left;
+  width: 40%;
+  font-weight: bold;
+  clear: both;
+}
+
+#attributes input {
+  width: 90%;
+}
+
+#attributes dd {
+/*  width: 20%;*/
+/*  display: inline-block;*/
+  float: right;
+  width: 48%;
 }
 
 /** System Options */
@@ -104,10 +151,6 @@ body {
   vertical-align: middle;
   text-align: center;
   padding: 3px;
-}
-
-#settings td input {
-  font-size: 12pt;
 }
 
 #settings td input[type="text"] {
