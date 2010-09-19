@@ -170,13 +170,23 @@ class BugEditEvent extends phalanx\events\Event
             // If there is no value for this attribute, then it was removed.
             if (!isset($set_attributes[$attr->title])) {
               $bug->RemoveAttribute($attr->title, $attr->is_tag());
+              continue;
             }
 
             // Otherwise, update the value.
             $validate = $attr->Validate($set_attributes[$attr->title]);
             if ($validate[0]) {
               $bug->SetAttribute($attr->title, $validate[1]);
+              unset($set_attributes[$attr->title]);
             }
+          }
+        }
+
+        // Any remaining set_attributes are not formally defined.  If the user
+        // has permission to set ad-hoc attributes, do so.
+        if (TRUE) {  // TODO: check permission
+          foreach ($set_attributes as $title => $value) {
+            $bug->SetAttribute($title, $value);
           }
         }
       }

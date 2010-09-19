@@ -108,6 +108,43 @@ class BugEditEventTest extends BugdarTestCase
         $this->assertEquals($data->comment_body, $comments[1]->body);
     }
 
+    public function testAddAdHocAttrs()
+    {
+        $bug = $this->_MakeBug();
+
+        $data = new \phalanx\base\PropertyBag(array(
+            '_method'    => 'POST',
+            'action'     => 'update',
+            'bug_id'     => $bug->bug_id,
+            'attributes' => array(
+                array(
+                    'title' => 'Attr1',
+                    'value' => 'V1'
+                ),
+                array(
+                    'title' => 'IsValid',
+                    'value' => 'YES'
+                )
+            )
+        ));
+        $event = new BugEditEvent($data);
+        EventPump::Pump()->PostEvent($event);
+        $this->assertEquals(EventPump::EVENT_FINISHED, $event->state());
+
+        $attrs = $bug->FetchAttributes();
+        $this->assertEquals(2, count($attrs));
+        foreach ($attrs as $attr) {
+            $title = $attr->attribute_title;
+            if ($title == 'Attr1') {
+                $this->assertEquals('V1', $attr->value);
+            } else if ($title == 'IsValid') {
+                $this->assertEquals('YES', $attr->value);
+            } else {
+                $this->fail('Unknown attribute pair: ' . $title . '=' . $attr->value);
+            }
+        }
+    }
+
     public function testNewBug()
     {
         $data = new phalanx\base\PropertyBag(array(
