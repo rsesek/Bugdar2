@@ -16,45 +16,45 @@
 
 class StandardSuccessEvent extends phalanx\events\Event
 {
-    static public function InputList()
-    {
-        return array();
-    }
+  static public function InputList()
+  {
+    return array();
+  }
 
-    static public function OutputList()
-    {
-        return array();
-    }
+  static public function OutputList()
+  {
+    return array();
+  }
 
-    public function __construct($location, $message)
-    {
-        $this->location = $location;
-        $this->message  = $message;
-    }
+  public function __construct($location, $message)
+  {
+    $this->location = $location;
+    $this->message  = $message;
+  }
 
-    public function Fire()
-    {}
+  public function Fire()
+  {}
 }
 
 class StandardErrorEvent extends phalanx\events\Event
 {
-    static public function InputList()
-    {
-        return array();
-    }
+  static public function InputList()
+  {
+    return array();
+  }
 
-    static public function OutputList()
-    {
-        return array();
-    }
+  static public function OutputList()
+  {
+    return array();
+  }
 
-    public function __construct($message)
-    {
-        $this->message  = $message;
-    }
+  public function __construct($message)
+  {
+    $this->message  = $message;
+  }
 
-    public function Fire()
-    {
-        phalanx\events\EventPump::Pump()->CancelDeferredEvents();
-    }
+  public function Fire()
+  {
+    phalanx\events\EventPump::Pump()->CancelDeferredEvents();
+  }
 }

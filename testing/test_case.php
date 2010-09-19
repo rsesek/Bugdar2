@@ -20,43 +20,43 @@ require_once 'PHPUnit/Framework.php';
 
 class AuthenticationTest extends Authentication
 {
-    public function IsLoggedIn()
-    {
-        return ($this->current_user != NULL);
-    }
+  public function IsLoggedIn()
+  {
+    return ($this->current_user != NULL);
+  }
 
-    public function __construct($user)
-    {
-        $this->current_user = $user;
-    }
+  public function __construct($user)
+  {
+    $this->current_user = $user;
+  }
 
-    protected function _PerformLogin()
-    {
-        throw new Exception('Should not have _PerformLogin() called in ' . __CLASS__);
-    }
+  protected function _PerformLogin()
+  {
+    throw new Exception('Should not have _PerformLogin() called in ' . __CLASS__);
+  }
 
-    protected function _PerformLogout()
-    {}
+  protected function _PerformLogout()
+  {}
 }
 
 // This is a specialization of the generic test case that has Bugdar-specific
 // features.
 abstract class BugdarTestCase extends PHPUnit_Framework_TestCase
 {
-    public function setUp()
-    {
-        phalanx\events\EventPump::set_pump(new \phalanx\events\EventPump());
-        phalanx\events\EventPump::Pump()->set_output_handler(
-            new phalanx\events\UnitTestOutputHandler());
-        Bugdar::$auth = NULL;
-    }
+  public function setUp()
+  {
+    phalanx\events\EventPump::set_pump(new \phalanx\events\EventPump());
+    phalanx\events\EventPump::Pump()->set_output_handler(
+        new phalanx\events\UnitTestOutputHandler());
+    Bugdar::$auth = NULL;
+  }
 
-    // Creates a mock authentication instance and test user.
-    protected function _RequireAuthentication()
-    {
-        $user = new User();
-        $user->email   = 'bugdar@bluestatic.org';
-        $user->Insert();
-        Bugdar::$auth = new AuthenticationTest($user);
-    }
+  // Creates a mock authentication instance and test user.
+  protected function _RequireAuthentication()
+  {
+    $user = new User();
+    $user->email   = 'bugdar@bluestatic.org';
+    $user->Insert();
+    Bugdar::$auth = new AuthenticationTest($user);
+  }
 }

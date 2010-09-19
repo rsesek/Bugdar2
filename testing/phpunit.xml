@@ -20,22 +20,22 @@
          backupStaticAttributes="FALSE"
          colors="TRUE">
 
-    <testsuites>
-        <testsuite name="Events">
-            <directory suffix="_test.php">./tests/</directory>
-            <directory suffix="_test.php">./tests/events/</directory>
-        </testsuite>
-    </testsuites>
+  <testsuites>
+    <testsuite name="Events">
+      <directory suffix="_test.php">./tests/</directory>
+      <directory suffix="_test.php">./tests/events/</directory>
+    </testsuite>
+  </testsuites>
 
-    <filter>
-        <blacklist>
-            <directory>./</directory>  <!-- Don't get coverage for test files. -->
-            <directory>../zend_lucene/</directory>
-            <directory>../phalanx/</directory>
-        </blacklist>
-    </filter>
+  <filter>
+    <blacklist>
+      <directory>./</directory>  <!-- Don't get coverage for test files. -->
+      <directory>../zend_lucene/</directory>
+      <directory>../phalanx/</directory>
+    </blacklist>
+  </filter>
 
-    <logging>
-        <log type="coverage-html" target="./unittest_coverage" yui="TRUE" highlight="TRUE"/>
-    </logging>
+  <logging>
+    <log type="coverage-html" target="./unittest_coverage" yui="TRUE" highlight="TRUE"/>
+  </logging>
 </phpunit>

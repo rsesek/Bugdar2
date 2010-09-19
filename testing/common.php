@@ -37,7 +37,7 @@ require_once BUGDAR_ROOT . '/testing/standard_events.php';
 // Read the configuration file.
 $config_path = BUGDAR_ROOT . '/testing/config.php';
 if (!file_exists($config_path) || !is_readable($config_path))
-    throw new CoreException('Could not read TESTING configuration file');
+  throw new CoreException('Could not read TESTING configuration file');
 $config = new phalanx\base\KeyDescender(require $config_path);
 
 // Setup common functionality.
@@ -46,5 +46,5 @@ Bugdar::BootstrapDatabase($config);
 // Clean out the test database.
 $stmt = Bugdar::$db->Query("SHOW TABLES");
 while ($table = $stmt->Fetch(PDO::FETCH_NUM)) {
-    Bugdar::$db->Query("TRUNCATE TABLE " . TABLE_PREFIX . $table[0]);
+  Bugdar::$db->Query("TRUNCATE TABLE " . TABLE_PREFIX . $table[0]);
 }

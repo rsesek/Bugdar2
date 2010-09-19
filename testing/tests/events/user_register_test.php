@@ -20,69 +20,69 @@ require_once BUGDAR_ROOT . '/events/user_register.php';
 
 class UserRegisterEventTest extends BugdarTestCase
 {
-    public function setUp()
-    {
-        parent::setUp();
-    }
+  public function setUp()
+  {
+    parent::setUp();
+  }
 
-    public function testAlreadyRegistered()
-    {
-        $this->_RequireAuthentication();
-        $event = new UserRegisterEvent();
-        EventPump::Pump()->PostEvent($event);
-        $this->assertTrue($event->is_cancelled());
-    }
+  public function testAlreadyRegistered()
+  {
+    $this->_RequireAuthentication();
+    $event = new UserRegisterEvent();
+    EventPump::Pump()->PostEvent($event);
+    $this->assertTrue($event->is_cancelled());
+  }
 
-    public function testUserRegister()
-    {
-        Bugdar::$auth = new AuthenticationTest(NULL);
-        $data = new phalanx\base\PropertyBag(array(
-            'do'           => 'submit',
-            'email'        => 'robert@bluestatic.org',
-            'alias'        => 'Robert',
-            'password'     => 'abc123'
-        ));
-        $event = new UserRegisterEvent($data);
-        EventPump::Pump()->PostEvent($event);
+  public function testUserRegister()
+  {
+    Bugdar::$auth = new AuthenticationTest(NULL);
+    $data = new phalanx\base\PropertyBag(array(
+      'do'       => 'submit',
+      'email'    => 'robert@bluestatic.org',
+      'alias'    => 'Robert',
+      'password' => 'abc123'
+    ));
+    $event = new UserRegisterEvent($data);
+    EventPump::Pump()->PostEvent($event);
 
-        $user = new User($event->user_id());
-        $user->FetchInto();
-        $this->assertEquals($data->email, $user->email);
-        $this->assertEquals($data->alias, $user->alias);
-        $this->assertGreaterThanOrEqual(5, strlen($user->salt));
-        $this->assertEquals(md5(sha1($data->password) . $user->salt), $user->password);
-        $this->assertGreaterThanOrEqual(5, strlen($user->authkey));
-    }
+    $user = new User($event->user_id());
+    $user->FetchInto();
+    $this->assertEquals($data->email, $user->email);
+    $this->assertEquals($data->alias, $user->alias);
+    $this->assertGreaterThanOrEqual(5, strlen($user->salt));
+    $this->assertEquals(md5(sha1($data->password) . $user->salt), $user->password);
+    $this->assertGreaterThanOrEqual(5, strlen($user->authkey));
+  }
 
-    public function testDuplicateEmail()
-    {
-        Bugdar::$auth = new AuthenticationTest(NULL);
-        $data = new phalanx\base\PropertyBag(array(
-            'do'           => 'submit',
-            'email'        => 'robert@bluestatic.org',
-            'alias'        => 'Robert',
-            'password'     => 'abc123'
-        ));
-        $event = new UserRegisterEvent($data);
-        EventPump::Pump()->PostEvent($event);
+  public function testDuplicateEmail()
+  {
+    Bugdar::$auth = new AuthenticationTest(NULL);
+    $data = new phalanx\base\PropertyBag(array(
+      'do'       => 'submit',
+      'email'    => 'robert@bluestatic.org',
+      'alias'    => 'Robert',
+      'password' => 'abc123'
+    ));
+    $event = new UserRegisterEvent($data);
+    EventPump::Pump()->PostEvent($event);
 
-        $last_event = EventPump::Pump()->GetEventChain()->Top();
-        $this->assertType('StandardErrorEvent', $last_event);
-    }
+    $last_event = EventPump::Pump()->GetEventChain()->Top();
+    $this->assertType('StandardErrorEvent', $last_event);
+  }
 
-    public function testInvalidEmail()
-    {
-        Bugdar::$auth = new AuthenticationTest(NULL);
-        $data = new phalanx\base\PropertyBag(array(
-            'do'           => 'submit',
-            'email'        => 'robert',
-            'alias'        => 'Robert',
-            'password'     => 'abc123'
-        ));
-        $event = new UserRegisterEvent($data);
-        EventPump::Pump()->PostEvent($event);
+  public function testInvalidEmail()
+  {
+    Bugdar::$auth = new AuthenticationTest(NULL);
+    $data = new phalanx\base\PropertyBag(array(
+      'do'       => 'submit',
+      'email'    => 'robert',
+      'alias'    => 'Robert',
+      'password' => 'abc123'
+    ));
+    $event = new UserRegisterEvent($data);
+    EventPump::Pump()->PostEvent($event);
 
-        $last_event = EventPump::Pump()->GetEventChain()->Top();
-        $this->assertType('StandardErrorEvent', $last_event);
-    }
+    $last_event = EventPump::Pump()->GetEventChain()->Top();
+    $this->assertType('StandardErrorEvent', $last_event);
+  }
 }
