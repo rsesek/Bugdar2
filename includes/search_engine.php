@@ -20,6 +20,7 @@ $path = ini_get('include_path');
 ini_set('include_path', $path . ':' . BUGDAR_ROOT . '/zend_lucene');
 
 require_once BUGDAR_ROOT . '/zend_lucene/Zend/Search/Lucene.php';
+require_once BUGDAR_ROOT . '/zend_lucene/Zend/Search/Lucene/Storage/Directory/Filesystem.php';
 
 class SearchEngine
 {
@@ -29,13 +30,14 @@ class SearchEngine
   public function __construct()
   {
     $index_path = BUGDAR_ROOT. '/cache/lucene_index';
+    Zend_Search_Lucene_Storage_Directory_Filesystem::SetDefaultFilePermissions(0777);
     if (file_exists($index_path))
       $this->lucene = Zend_Search_Lucene::Open($index_path);
     else
       $this->lucene = Zend_Search_Lucene::Create($index_path);
   }
 
-  public function IndexBug($obj)
+  public function IndexBug($bug)
   {
     $this->RemoveBug($bug->bug_id);
 
