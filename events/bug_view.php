@@ -72,7 +72,12 @@ class BugViewEvent extends phalanx\events\Event
   public function Fire()
   {
     $bug = new Bug($this->input->_id);
-    $bug->FetchInto();
+    try {
+      $bug->FetchInto();
+    } catch (\phalanx\data\ModelException $e) {
+      EventPump::Pump()->RaiseEvent(new StandardErrorEvent(l10n::S('BUG_ID_NOT_FOUND')));
+      return;
+    }
     $this->bug          = $bug;
     $this->bug_reporter = $bug->FetchReporter();
     $this->attributes   = $bug->FetchAttributes();
