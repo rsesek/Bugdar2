@@ -195,6 +195,7 @@ class ModelAttributeTest extends BugdarTestCase
     $v = $attr->Validate('January 1 2000');
     $this->assertTrue($v[0]);
     $this->assertGreaterThanOrEqual(gmmktime(0, 0, 0, 1, 1, 2000), $v[1]);
+    $this->assertLessThan(gmmktime(0, 0, 0, 2, 1, 2000), $v[1]);
 
     $s = 'gobbledygoook';
     $v = $attr->Validate($s);
@@ -212,12 +213,12 @@ class ModelAttributeTest extends BugdarTestCase
 
     $v = $attr->Validate(NULL);
     $this->assertTrue($v[0]);
-    $this->assertGreaterThanOrEqual($time, $v[1]);
+    $this->assertGreaterThanOrEqual($now, $v[1]);
 
     $attr->required = TRUE;
     $v = $attr->Validate('');
     $this->assertTrue($v[0]);
-    $this->assertGreaterThanOrEqual($time, $v[1]);
+    $this->assertGreaterThanOrEqual($now, $v[1]);
   }
 
   public function testValidateUserRequiredEmptyDefault()
