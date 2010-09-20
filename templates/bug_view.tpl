@@ -23,9 +23,14 @@
 <div id="bug-comments">
   <? if ($this->action != 'insert'): ?>
     <? foreach ($this->comments as $comment): ?>
-    <div>
-      <strong>Posted by <a href="<?= EventLink('UserView', $comment->post_alias) ?>"><?= Cleaner::HTML($comment->post_alias) ?></a> on <?= gmdate('r', $comment->post_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?></strong>
-      <p><?= Cleaner::HTML($comment->body) ?></p>
+    <div class="comment">
+      <h3 class="author-line">
+        Posted by
+          <a href="<?= EventLink('UserView', $comment->post_alias) ?>"><?= Cleaner::HTML($comment->post_alias) ?></a>
+        on
+          <?= gmdate('j F Y \a\t H:i', $comment->post_date + (Bugdar::$auth->current_user()->timezone * 3600)) ?>
+      </h3>
+      <p class="body"><?= nl2br(Cleaner::HTML($comment->body)) ?></p>
     </div>
     <? endforeach ?>
   <? endif ?>
