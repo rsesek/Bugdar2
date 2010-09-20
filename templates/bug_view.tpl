@@ -51,8 +51,10 @@
 
   <div class="clear"></div>
 
-  <div><a href="javascript:AddAttribute()">Add Attribute</a></div>
-  <div><input type="submit" name="submit" value="Save Changes" id="submit" /></div>
+  <div>
+    <input type="button" name="add_attribute" value="Add Attribute" onclick="AddAttribute()" />
+    <input type="submit" name="submit" value="Save Changes" id="submit" />
+  </div>
 </div>
 
 </form>

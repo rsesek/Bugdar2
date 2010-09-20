@@ -34,11 +34,57 @@ body, input, textarea {
   padding: 7px;
 }
 
+#no-wrapper {
+  margin-top: -10px;
+  border-top: 1px solid black;
+}
+
 #footer {
   font-size: 9pt;
   text-align: center;
   margin-top: 20px;
 }
+
+input[type="submit"], input[type="reset"], input[type="button"] {
+  background: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0, rgb(179,179,179)),
+    color-stop(1, rgb(230, 230, 230))
+  );
+  background: -moz-linear-gradient(
+    center bottom,
+    rgb(179,179,179) 0%
+    rgb(230, 230, 230) 100%,
+  );
+
+  color: rgb(77, 77, 77);
+  font-size: 10pt;
+  font-weight: bold;
+
+  padding: 3px 15px 3px 15px;
+
+  border-style: solid;
+  border-color: rgb(128, 128, 128);
+  border-width: 1px;
+  border-radius: 12pt;
+}
+
+  input[type="submit"]:active, input[type="reset"]:active, input[type="button"]:active {
+    background: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(1, rgb(179,179,179)),
+      color-stop(0, rgb(230, 230, 230))
+    );
+    background: -moz-linear-gradient(
+      center bottom,
+      rgb(179,179,179) 100%
+      rgb(230, 230, 230) 0%,
+    );
+  }
 
 .clear {
   clear: both;
@@ -79,7 +125,7 @@ body, input, textarea {
     color-stop(0.5, rgb(255,255,255)),
     color-stop(1, #BBBDE3)
   );
-  background: ;-moz-linear-gradient(
+  background: -moz-linear-gradient(
     center bottom,
     rgb(255,255,255) 90%,
     #BBBDE3 100%
