@@ -212,6 +212,18 @@ input[type="submit"], input[type="reset"], input[type="button"] {
     border: 1px solid black;
   }
 
+/** Admin navigation */
+#admin-navigation {
+  float: left;
+  background-color: rgb(200, 255, 255);
+  padding: 3px;
+  list-style: none;
+}
+
+  #admin-navigation li {
+    margin: 10px;
+  }
+
 /** System Options */
 #settings {
   width: 75%;

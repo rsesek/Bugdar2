@@ -33,23 +33,36 @@ class Usergroup extends phalanx\data\Model
   );
 
   // Permission masks {{
-    const CAN_VIEW        = 1;
-    const CAN_REPORT      = 2;
-    const CAN_VOTE        = 4;
-    const CAN_COMMENT       = 8;
-    const CAN_UPDATE      = 16;
-    const CAN_VIEW_HIDDEN     = 32;
+    const CAN_VIEW              = 1;
+    const CAN_REPORT            = 2;
+    const CAN_VOTE              = 4;
+    const CAN_COMMENT           = 8;
+    const CAN_UPDATE            = 16;
+    const CAN_VIEW_HIDDEN       = 32;
     const CAN_EDIT_OWN_COMMENTS = 64;
     const CAN_EDIT_ALL_COMMENTS = 128;
-    const CAN_EDIT_REPORT     = 256;
+    const CAN_EDIT_REPORT       = 256;
     const CAN_DELETE_COMMENTS   = 512;
-    const CAN_DELETE_REPORTS  = 1024;
+    const CAN_DELETE_REPORTS    = 1024;
   // }}
+  static public $permissions = array(
+    'CAN_VIEW'              => 1,
+    'CAN_REPORT'            => 2,
+    'CAN_VOTE'              => 4,
+    'CAN_COMMENT'           => 8,
+    'CAN_UPDATE'            => 16,
+    'CAN_VIEW_HIDDEN'       => 32,
+    'CAN_EDIT_OWN_COMMENTS' => 64,
+    'CAN_EDIT_ALL_COMMENTS' => 128,
+    'CAN_EDIT_REPORT'       => 256,
+    'CAN_DELETE_COMMENTS'   => 512,
+    'CAN_DELETE_REPORTS'    => 1024,
+  );
 
   // Default, built-in roles {{
-    const ROLE_ANONYMOUS = 1;
-    const ROLE_REGISTERED = 2;
-    const ROLE_DEVELOPER = 3;
+    const ROLE_ANONYMOUS     = 1;
+    const ROLE_REGISTERED    = 2;
+    const ROLE_DEVELOPER     = 3;
     const ROLE_ADMINISTRATOR = 4;
   // }}
 

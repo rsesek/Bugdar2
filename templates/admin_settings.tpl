@@ -1,4 +1,5 @@
 <? InsertView('header', array('title' => l10n::S('ADMIN_SETTINGS_TITLE'))) ?>
+<? InsertView('admin_sidebar') ?>
 
 <form action="<?= EventLink('AdminSettings') ?>" method="post">
 

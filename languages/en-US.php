@@ -36,6 +36,10 @@ class Language_en_US extends \bugdar\Language
   public function & strings()
   {
     static $strings = array(
+      'ERROR_INVALID_ID' => 'Could not find object with that ID.',
+      'BUTTON_SAVE_CHANGES' => 'Save Changes',
+      'BUTTON_RESET' => 'Reset',
+
       'BUG_LIST_TITLE' => 'List',
 
       'BUG_NEW_TITLE' => 'New Report',
@@ -51,6 +55,25 @@ class Language_en_US extends \bugdar\Language
       'ADMIN_SETTINGS_WEBROOT_VAR' => 'Web Root',
       'ADMIN_SETTINGS_WEBROOT_DFN' => 'The absolute path from the server root to the Bugdar installation.  This should end with a trailing slash.',
       'ADMIN_SETTINGS_SAVE' => 'Save Settings',
+
+      'ADMIN_USERGROUPS_TITLE' => 'Usergroups',
+      'ADMIN_USERGROUP_TITLE' => 'Usergroup Title',
+      'ADMIN_USERGROUP_DISPLAY_TITLE' => 'Display Title',
+      'ADMIN_USERGROUP_HAS_MASK' => 'Group Type',
+      'ADMIN_USERGROUP_ROLE_GROUP' => 'Role Group',
+      'ADMIN_USERGROUP_PURE_GROUP' => 'User Group',
+      'ADMIN_USERGROUP_PERMISSIONS' => 'Permissions',
+      'ADMIN_USERGROUP_PERMISSION_CAN_VIEW' => 'Can View Bug Reports',
+      'ADMIN_USERGROUP_PERMISSION_CAN_REPORT' => 'Can Create New Bug Reports',
+      'ADMIN_USERGROUP_PERMISSION_CAN_VOTE' => 'Can Vote on Bugs',
+      'ADMIN_USERGROUP_PERMISSION_CAN_COMMENT' => 'Can Leave Comments on Bugs',
+      'ADMIN_USERGROUP_PERMISSION_CAN_UPDATE' => 'Can Modify Bug Fields',
+      'ADMIN_USERGROUP_PERMISSION_CAN_VIEW_HIDDEN' => 'Can View Hidden Bugs',
+      'ADMIN_USERGROUP_PERMISSION_CAN_EDIT_OWN_COMMENTS' => 'Can Edit Own Comments',
+      'ADMIN_USERGROUP_PERMISSION_CAN_EDIT_ALL_COMMENTS' => 'Can Edit All Comments',
+      'ADMIN_USERGROUP_PERMISSION_CAN_EDIT_REPORT' => 'Can Edit Bug Reports',
+      'ADMIN_USERGROUP_PERMISSION_CAN_DELETE_COMMENTS' => 'Can Delete Comments',
+      'ADMIN_USERGROUP_PERMISSION_CAN_DELETE_REPORTS' => 'Can Delete Bugs',
     );
     return $strings;
   }
