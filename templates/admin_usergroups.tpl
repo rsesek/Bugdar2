@@ -15,6 +15,12 @@
   </tr>
 <? endforeach?>
 
+  <tr>
+    <td colspan="2" style="background-color: lightgray">
+      <a href="<?= EventLink('AdminUsergroupsEdit') ?>"><input type="button" name="add_group" value="<?= l10n::S('ADMIN_USERGROUP_NEW') ?>" /></a>
+    </td>
+  </tr>
+
 </table>
 
 <? InsertView('footer') ?>

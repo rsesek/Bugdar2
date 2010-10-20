@@ -30,6 +30,9 @@
     <th colspan="2" style="text-align: center; background-color: lightgray">
       <input type="submit" name="submit" value="<?= l10n::S('BUTTON_SAVE_CHANGES') ?>" id="submit" />
       <input type="reset" name="reset" value="<?= l10n::S('BUTTON_RESET') ?>" id="reset" />
+      <? if ($this->usergroup->usergroup_id): ?>
+        <input type="button" name="reset" value="<?= l10n::S('BUTTON_DELETE') ?>" id="delete" />
+      <? endif ?>
     </th>
   </tr>
 </table>

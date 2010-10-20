@@ -39,6 +39,7 @@ class Language_en_US extends \bugdar\Language
       'ERROR_INVALID_ID' => 'Could not find object with that ID.',
       'BUTTON_SAVE_CHANGES' => 'Save Changes',
       'BUTTON_RESET' => 'Reset',
+      'BUTTON_DELETE' => 'Delete',
 
       'BUG_LIST_TITLE' => 'List',
 
@@ -57,6 +58,7 @@ class Language_en_US extends \bugdar\Language
       'ADMIN_SETTINGS_SAVE' => 'Save Settings',
 
       'ADMIN_USERGROUPS_TITLE' => 'Usergroups',
+      'ADMIN_USERGROUP_NEW' => 'Create New Usergroup',
       'ADMIN_USERGROUP_TITLE' => 'Usergroup Title',
       'ADMIN_USERGROUP_DISPLAY_TITLE' => 'Display Title',
       'ADMIN_USERGROUP_HAS_MASK' => 'Group Type',
